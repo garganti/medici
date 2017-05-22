@@ -8,7 +8,6 @@
 #ifndef TUPLE_H_
 #define TUPLE_H_
 #include "header.h"
-#include <stdint.h>
 
 using namespace std;
 
