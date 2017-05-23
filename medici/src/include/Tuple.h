@@ -36,7 +36,7 @@ public:
 	vector<int> paramCASA; //param index in casa format
 	//list < Tuple > inserted;
 //	dd_edge node;
-	uint compClass;
+	unsigned int compClass;
 //	int compCard;
 //	double cardDiff;
 	double weight; //valore pesato sui parametri che contiene che ne decreta la sua importanza
@@ -70,7 +70,7 @@ public:
 	 * @param params
 	 * @param casa codes
 	 */
-	Tuple(vector<cvalue>, vector<int>, vector<int>,uint compClass=0); //passa codice e indice parametri
+	Tuple(vector<cvalue>, vector<int>, vector<int>,unsigned int compClass=0); //passa codice e indice parametri
 
 	/**
 	 * Constructor from the number of parameters, it create an empty tuple with n values

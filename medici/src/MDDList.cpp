@@ -10,6 +10,11 @@
 #include "logger.hpp"
 #include <sstream>
 
+// da FCC >= 4.7 uint non è più supportato
+#ifndef uint
+#define uint unsigned int
+#endif
+
 bool fSortWeight(vector<int> i, vector<int> j) {
 	return (i[1] > j[1]);
 }

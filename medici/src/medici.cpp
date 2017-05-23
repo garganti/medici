@@ -8,6 +8,12 @@
 #include "MEDICI.h"
 #include "logger.hpp"
 
+// da FCC >= 4.7 uint non è più supportato: https://github.com/CRPropa/CRPropa3/issues/89
+#ifndef uint
+#define uint unsigned int
+#endif
+
+
 MEDICI::MEDICI() {
 }
 
@@ -18,7 +24,7 @@ int MEDICI::normalMode(Settings setting, vector<int> &res) {
 	char outputStats[1000];
 	srand(time(0));
 	vector<int> resSize;
-	settings s;
+	Settings s;
 	s.computeTable.maxSize = 4000;
 	strcpy(outputStats, setting.out);
 	strcat(outputStats, ".stats");
@@ -274,7 +280,7 @@ int MEDICI::normalMode(Settings setting, vector<int> &res) {
 
 int MEDICI::validateMode(Settings setting) {
 	srand(time(0));
-	settings s;
+	Settings s;
 	s.computeTable.maxSize = 4000;
 	int64 now;
 

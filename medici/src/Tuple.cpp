@@ -7,6 +7,12 @@
 
 #include "Tuple.h"
 #include <sstream>
+
+// da FCC >= 4.7 uint non è più supportato: https://github.com/CRPropa/CRPropa3/issues/89
+#ifndef uint
+#define uint unsigned int
+#endif
+
 Tuple::Tuple(vector<cvalue> code, vector<int> param, vector<int> paramC, uint compClass) {
 	this->code = code;
 	this->param = param;

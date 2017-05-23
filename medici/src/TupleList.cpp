@@ -11,6 +11,12 @@
 #include <sstream>
 #include "logger.hpp"
 
+// da FCC >= 4.7 uint non è più supportato: https://github.com/CRPropa/CRPropa3/issues/89
+#ifndef uint
+#define uint unsigned int
+#endif
+
+
 // a predicate implemented as a function:
 bool checkCovered(const Tuple::compType& value) {
 	return (value.otherIndex->status);
