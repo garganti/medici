@@ -18,10 +18,16 @@ file(GLOB medici_src . src/*.cpp)
 
 message(${medici_src})
 
+#add_subdirectory(meddly_svn/lib)
+#LINK_DIRECTORIES(meddly_svn/lib)
+#add_library(libmeddly STATIC IMPORTED)
+#set_property(TARGET libmeddly PROPERTY IMPORTED_LOCATION meddly_svn/lib/libmeddly.la)
+
 add_executable(medici ${medici_src})
 
+include_directories(meddly_svn/include)
 target_link_libraries(medici ${Boost_LIBRARIES})
-
+target_link_libraries(medici ${CMAKE_CURRENT_SOURCE_DIR}/meddly_svn/lib/libmeddly.a)
 
 # TODO (per ora assumo che meddly sia già scaricato e compilato - non installato - no make install) 
 # include(ExternalProject)
@@ -30,12 +36,14 @@ target_link_libraries(medici ${Boost_LIBRARIES})
 #    CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/meddly_svn/configure
 #    BUILD_COMMAND ${MAKE})
 
+#LINK_DIRECTORIES(meddly_svn/lib)
+
 # gli include di meddly in src
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
 
 set(MEDDLY_INCLUDE meddly_svn/src meddly_svn/src/forest)
-
+ 
 set(MEDICI_INCLUDE src/include)
 
 include_directories(${MEDDLY_INCLUDE} ${MEDICI_INCLUDE})
