@@ -24,14 +24,16 @@ int MEDICI::normalMode(Settings setting, vector<int> &res) {
 	char outputStats[1000];
 	srand(time(0));
 	vector<int> resSize;
-	Settings s;
-	s.computeTable.maxSize = 4000;
+	// TODO change the inializer
+	//settings s;
+	//s.computeTable.maxSize = 4000;
+	//initialize(s);
+	MEDDLY::initialize();
 	strcpy(outputStats, setting.out);
 	strcat(outputStats, ".stats");
 	int64 now;
 	int64 partial = 0;
 	int64 partial2;
-	initialize(s);
 
 	now = Operations::getTimeMs64();
 	TupleList tupleList(setting);
@@ -78,7 +80,8 @@ int MEDICI::normalMode(Settings setting, vector<int> &res) {
 	//exit(0);
 	cleanup(); //cleanup dopo uso per generazione nwise
 	//INIT
-	initialize(s);
+	//initialize(s);
+	MEDDLY::initialize();
 	logcout(LOG_INFO) << getLibraryInfo() << endl;
 
 	// Create a domain
@@ -280,13 +283,13 @@ int MEDICI::normalMode(Settings setting, vector<int> &res) {
 
 int MEDICI::validateMode(Settings setting) {
 	srand(time(0));
-	Settings s;
-	s.computeTable.maxSize = 4000;
-	int64 now;
+	//TODO initialize MDD with the maxSize
+	//MEDDLY::settings s;
+	//s.computeTable.maxSize = 4000;
+	//initialize(s);
+	MEDDLY::initialize();
 
-	initialize(s);
-
-	now = Operations::getTimeMs64();
+	int64 now = Operations::getTimeMs64();
 	TupleList tupleList(setting);
 
 	vector<Operations::TestModel> testModel;
@@ -330,7 +333,8 @@ int MEDICI::validateMode(Settings setting) {
 	//exit(0);
 	cleanup(); //cleanup dopo uso per generazione nwise
 	//INIT
-	initialize(s);
+	//initialize(s);
+	MEDDLY::initialize();
 	logcout(LOG_INFO) << getLibraryInfo() << endl;
 
 	// Create a domain
