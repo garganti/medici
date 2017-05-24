@@ -91,3 +91,23 @@ time execution script 15ms
 
 ### Examples
 In folder examples are present several examples.
+
+## Paper
+If you use this tool for academic research, please cite:
+[*Efficient Combinatorial Test Generation based on Multivalued Decision Diagrams*](http://cs.unibg.it/gargantini/research/abstracts/hvc14.html)
+(Gargantini, Angelo, and Vavassori, Paolo) in Hardware and Software: Verification and Testing, Haifa Verification Conference HVC 2014 (Eds. Yahav, Eran) Springer International Publishing, Lecture Notes in Computer Science, vol. 8855 (2014): 220-235 ISBN 978-3-319-13337-9
+```
+@Inbook{Gargantini2014,
+  author="Gargantini, Angelo and Vavassori, Paolo",
+  editor="Yahav, Eran",
+  title="Efficient Combinatorial Test Generation Based on Multivalued Decision Diagrams",
+  bookTitle="Hardware and Software: Verification and Testing: 10th International Haifa Verification Conference, HVC 2014, Haifa, Israel, November 18-20, 2014. Proceedings",
+  year="2014",
+  publisher="Springer International Publishing",
+  address="Cham",
+  pages="220--235",
+  isbn="978-3-319-13338-6",
+  doi="10.1007/978-3-319-13338-6_17",
+  url="http://dx.doi.org/10.1007/978-3-319-13338-6_17"
+}
+```
