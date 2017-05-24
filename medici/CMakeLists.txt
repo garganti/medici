@@ -30,9 +30,9 @@ add_executable(medici ${medici_src})
 include_directories(meddly_svn/include)
 target_link_libraries(medici ${Boost_LIBRARIES})
 target_link_libraries(medici libmeddly.a)
-target_link_libraries(medici gmp libgmp)
+target_link_libraries(medici gmp)
 
-# TODO (per ora assumo che meddly sia gi‡ scaricato e compilato - non installato - no make install) 
+# TODO (per ora assumo che meddly sia gi√† scaricato e compilato - non installato - no make install) 
 # include(ExternalProject)
 # ExternalProject_Add(meddly
 #    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/meddly_svn
