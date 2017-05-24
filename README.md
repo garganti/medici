@@ -6,8 +6,8 @@ Tested on Windows with Cygwin and Linux (Ubuntu)
 
 ### installation
 * place the source code of [MEDDLY](http://meddly.sourceforge.net/obtain.html) in folder medici/meddly_svn and perform the required steps to compile and install it. Make sure to have, at the end, the file meddly_svn/lib/libmeddly.a.
-* You need gmp (for meddly) and boost (program_options)
-* run `runcmake.txt`, the executable file is produced under build directory.
+* You need gmp (for meddly) and boost (program_options).
+* execute `mkdir build` to create a temporary directory, execute `cd build`, `cmake ..`, and finally run `make`. Alternatively run `runcmake.txt` in the main dir. The executable file is produced under build directory.
 
 ### Running MEDICI
 Supposing on Windows, from Cygwin command line:
