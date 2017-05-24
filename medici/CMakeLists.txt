@@ -2,11 +2,12 @@ cmake_minimum_required (VERSION 3.6)
 
 project (medici)
 
-
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}")
 set(Boost_USE_STATIC_LIBS OFF) 
 set(Boost_USE_MULTITHREADED ON)  
 set(Boost_USE_STATIC_RUNTIME OFF) 
-find_package(Boost COMPONENTS program_options) 
+find_package(Boost COMPONENTS REQUIRED program_options) 
+find_package(GMP REQUIRED)
 
 # include_directories(${Boost_INCLUDE_DIRS}) 
 
@@ -22,12 +23,14 @@ message(${medici_src})
 #LINK_DIRECTORIES(meddly_svn/lib)
 #add_library(libmeddly STATIC IMPORTED)
 #set_property(TARGET libmeddly PROPERTY IMPORTED_LOCATION meddly_svn/lib/libmeddly.la)
+LINK_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/meddly_svn/lib)
 
 add_executable(medici ${medici_src})
 
 include_directories(meddly_svn/include)
 target_link_libraries(medici ${Boost_LIBRARIES})
-target_link_libraries(medici ${CMAKE_CURRENT_SOURCE_DIR}/meddly_svn/lib/libmeddly.a)
+target_link_libraries(medici libmeddly.a)
+target_link_libraries(medici gmp libgmp)
 
 # TODO (per ora assumo che meddly sia già scaricato e compilato - non installato - no make install) 
 # include(ExternalProject)
