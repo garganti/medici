@@ -1,13 +1,16 @@
 # medici
-medici - mdd for combinatorial testing
+medici is a tool for combinatorial test generation based on the use of Multiple-Valued Decision Diagrams
 
 ### Compatibility
 Tested on Windows with Cygwin and Linux (Ubuntu)
 
-### installation
-* place the source code of [MEDDLY](http://meddly.sourceforge.net/obtain.html) in folder medici/meddly_svn and perform the required steps to compile and install it. Make sure to have, at the end, the file meddly_svn/lib/libmeddly.a.
+### Installation
+* place the source code of [MEDDLY](http://meddly.sourceforge.net/obtain.html) (we use the latest svn version of MEDDLY) in folder medici/meddly_svn and perform the required steps to compile and install it. Make sure to have, at the end, the file meddly_svn/lib/libmeddly.a.
 * You need gmp (for meddly) and boost (program_options).
-* execute `mkdir build` to create a temporary directory, execute `cd build`, `cmake ..`, and finally run `make`. Alternatively run `runcmake.txt` in the main dir. The executable file is produced under build directory.
+* From the medici directory, execute `mkdir build` to create a temporary directory, execute `cd build`, `cmake ..`, and finally run `make`. Alternatively run `runcmake.txt` in the main dir. The executable file is produced under build directory.
+
+### Binaries
+We will provide the binaries soon.
 
 ### Running MEDICI
 Supposing on Windows, from Cygwin command line:
@@ -92,6 +95,9 @@ time execution script 15ms
 
 ### Examples
 In folder examples are present several examples.
+
+## People
+Most of the implementation work has been done by [Dario Corna](https://www.linkedin.com/in/dario-corna-908b3778/) for his master thesis.  [Angelo Gargantini](http://cs.unibg.it/gargantini/) and [Paolo Vavassori](http://cs.unibg.it/vavassori/) supervised his thesis. [Marco Radavelli](http://cs.unibg.it/radavelli/) ported the code to cmake. For problems, contact [Angelo Gargantini](mailto://angelo.gargantini@unibg.it)  
 
 ## Paper
 If you use this tool for academic research, please cite:
