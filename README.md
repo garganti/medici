@@ -10,7 +10,8 @@ Tested on Windows with Cygwin and Linux (Ubuntu)
 * From the medici directory, execute `mkdir build` to create a temporary directory, execute `cd build`, `cmake ..`, and finally run `make`. Alternatively run `runcmake.txt` in the main dir. The executable file is produced under build directory.
 
 ### Binaries
-* The binaries for [cygwin](https://www.cygwin.com/) can be found [here](https://github.com/garganti/medici/tree/master/binaries/cygwin)
+* The binaries for [cygwin](https://www.cygwin.com/) can be found [here](https://github.com/garganti/medici/tree/master/binaries/cygwin). You will need boost_program_options and gmp dynamic libraries installed.
+* The binaries for linux can be found [here](https://github.com/garganti/medici/tree/master/binaries/linux). Also in this case you will need boost_program_options and gmp dynamic libraries installed.
 * We will provide binaries for other platforms soon.
 
 ### Running MEDICI
