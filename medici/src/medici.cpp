@@ -265,9 +265,9 @@ int MEDICI::normalMode(Settings setting, vector<int> &res) {
 
 	fout.close();
 
-	destroyDomain(d);
+	//destroyDomain(d);
 
-	cleanup();
+	//cleanup();
 
 	logcout(LOG_INFO) << "time execution script " << Operations::getTimeMs64() - now << "ms"
 			<< endl;
