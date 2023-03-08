@@ -15,6 +15,6 @@
 	<natures>
 		<nature>org.eclipse.cdt.core.cnature</nature>
 		<nature>org.eclipse.cdt.core.ccnature</nature>
-		<nature>org.eclipse.cdt.cmake.core.cmakeNature</nature>
+		<nature>org.eclipse.cdt.meson.core.mesonNature</nature>
 	</natures>
 </projectDescription>

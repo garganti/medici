@@ -8,7 +8,7 @@
 #include "MEDICI.h"
 #include "logger.hpp"
 
-// da FCC >= 4.7 uint non è più supportato: https://github.com/CRPropa/CRPropa3/issues/89
+// da FCC >= 4.7 uint non ï¿½ piï¿½ supportato: https://github.com/CRPropa/CRPropa3/issues/89
 #ifndef uint
 #define uint unsigned int
 #endif
@@ -151,7 +151,7 @@ int MEDICI::normalMode(Settings setting, vector<int> &res) {
 			tupleList.checkCompatibility(mdd, mddList.nodoBase);
 			tupleList.checkParamListNew(mdd);
 		} else {
-			tupleList.checkParamList(mdd); //Se non lo faccio non converge neanche più
+			tupleList.checkParamList(mdd); //Se non lo faccio non converge neanche piï¿½
 		}
 		partial2 = Operations::getTimeMs64();
 		tupleList.sortCompatibility();
@@ -177,7 +177,7 @@ int MEDICI::normalMode(Settings setting, vector<int> &res) {
 				tupleList.checkCompatibility(mdd, mddList.nodoBase);
 				tupleList.checkParamListNew(mdd);
 			} else
-				tupleList.checkParamList(mdd); //Se non lo faccio non converge neanche più
+				tupleList.checkParamList(mdd); //Se non lo faccio non converge neanche piï¿½
 
 			logcout(LOG_INFO) << "TUPLE RIMANENTI " << tupleList.size() << endl;
 			if (tupleList.size() < 0) {
@@ -207,7 +207,7 @@ int MEDICI::normalMode(Settings setting, vector<int> &res) {
 					codeCheck = true;
 				else
 					codeCheck = false;
-				//break; //non itero più se la coda è numerosa
+				//break; //non itero piï¿½ se la coda ï¿½ numerosa
 			}
 		}
 		// se non ho raggiunto il minmi, continua comunque
@@ -240,7 +240,7 @@ int MEDICI::normalMode(Settings setting, vector<int> &res) {
 	logcout(LOG_INFO) << "Ottenuti: " << minSize << " mdd" << endl;
 	logcout(LOG_INFO) << "Tempo per ordinamenti: " << partial << "ms" << endl;
 
-	mdd->garbageCollect();
+	// AG 03.08.23 mdd->garbageCollect();
 	//cout<<outputFile<<"***********"<<endl;
 	mddListBest.listToFile(setting.out, bounds);
 	//Salvataggio stats su file
