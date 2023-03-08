@@ -2,8 +2,6 @@
 inc = include_directories('include')
 
 meddly = meson.get_compiler('cpp').find_library('meddly')
-
-#meddly = dependency('meddly')
 boost = dependency('boost', modules : ['program_options'])
 
 my_dep = declare_dependency(#link_with : [gmp],
