@@ -6,8 +6,11 @@
  */
 #include "header.h"
 #include "logger.hpp"
+#include "ConstraintTree.h"
+#include <string>
+#include <boost/tokenizer.hpp>
 
-// da FCC >= 4.7 uint non è più supportato: https://github.com/CRPropa/CRPropa3/issues/89
+// da FCC >= 4.7 uint non ï¿½ piï¿½ supportato: https://github.com/CRPropa/CRPropa3/issues/89
 #ifndef uint
 #define uint unsigned int
 #endif
@@ -21,7 +24,7 @@ Operations::~Operations() {
 	// TODO Auto-generated destructor stub
 }
 // trim from start
-static inline std::string &ltrim(std::string &s) {
+static inline std::string& ltrim(std::string &s) {
 	s.erase(s.begin(),
 			std::find_if(s.begin(), s.end(),
 					std::not1(std::ptr_fun<int, int>(std::isspace))));
@@ -29,7 +32,7 @@ static inline std::string &ltrim(std::string &s) {
 }
 
 // trim from end
-static inline std::string &rtrim(std::string &s) {
+static inline std::string& rtrim(std::string &s) {
 	s.erase(
 			std::find_if(s.rbegin(), s.rend(),
 					std::not1(std::ptr_fun<int, int>(std::isspace))).base(),
@@ -38,7 +41,7 @@ static inline std::string &rtrim(std::string &s) {
 }
 
 // trim from both ends
-static inline std::string &trim(std::string &s) {
+static inline std::string& trim(std::string &s) {
 	return ltrim(rtrim(s));
 }
 
@@ -52,7 +55,7 @@ vector<cvalue> Operations::getCodeFromMdd(dd_edge e) {
 	if (e.getCardinality() == 0)
 		return code; //errore non ci sono soluzioni
 	for (enumerator iter(e); iter; ++iter) {
-		const int* minterm = iter.getAssignments();
+		const int *minterm = iter.getAssignments();
 		//fprintf(strm, "[");
 		for (int i = nLevels; i > 0; i--) {
 			code[nLevels - i] = minterm[i];
@@ -63,7 +66,7 @@ vector<cvalue> Operations::getCodeFromMdd(dd_edge e) {
 	}
 	return code;
 }
-vector<cvalue> Operations::getCodeFromParameter(int v, int* bounds, int N,
+vector<cvalue> Operations::getCodeFromParameter(int v, int *bounds, int N,
 		int &in) {
 	//conversione da modello CASA a questo
 
@@ -83,8 +86,8 @@ vector<cvalue> Operations::getCodeFromParameter(int v, int* bounds, int N,
 	return code;
 }
 
-void Operations::getIndexAndValue(int casav,int* bounds , int N, int &index,int &value)
-{
+void Operations::getIndexAndValue(int casav, int *bounds, int N, int &index,
+		int &value) {
 	//conversione da modello CASA a questo
 
 	//  cout<<v<<" VALORE DA MODELLO CASA "<<N<<endl;
@@ -96,7 +99,7 @@ void Operations::getIndexAndValue(int casav,int* bounds , int N, int &index,int 
 		if (casav < (in + bounds[N - 1 - i])) {
 			//code[i] = v - index;
 			index = i;
-			value = casav-in;
+			value = casav - in;
 			break; //assegnato esco dal ciclo
 		}
 		in += bounds[N - 1 - i];
@@ -104,7 +107,7 @@ void Operations::getIndexAndValue(int casav,int* bounds , int N, int &index,int 
 
 	return;
 }
-vector<cvalue> Operations::getValueFromParameter(int v, int* bounds, int N) {
+vector<cvalue> Operations::getValueFromParameter(int v, int *bounds, int N) {
 	//conversione da modello CASA a questo
 
 //  cout<<v<<" VALORE DA MODELLO CASA "<<N<<endl;
@@ -115,7 +118,7 @@ vector<cvalue> Operations::getValueFromParameter(int v, int* bounds, int N) {
 
 		if (v < (index + bounds[N - 1 - i])) {
 			code[1] = v - index;
-			code[0]= i;
+			code[0] = i;
 			break; //assegnato esco dal ciclo
 		}
 		index += bounds[N - 1 - i];
@@ -124,7 +127,7 @@ vector<cvalue> Operations::getValueFromParameter(int v, int* bounds, int N) {
 }
 int Operations::testModelConstraintsFromFileCASA(
 		vector<list<Operations::TestModelConstraint> > &testModel,
-		char* filename) {
+		char *filename) {
 	ifstream myReadFile;
 	string strRow;
 	uint N = 0;
@@ -157,7 +160,7 @@ int Operations::testModelConstraintsFromFileCASA(
 			}
 			k++;
 			int value = atoi(tokens[k].c_str());
-			Operations::TestModelConstraint pT(value,sign);
+			Operations::TestModelConstraint pT(value, sign);
 			pTList.push_front(pT);
 		}
 		//ho terminato la riga e quindi ho definito ci
@@ -169,13 +172,107 @@ int Operations::testModelConstraintsFromFileCASA(
 	return 0;
 }
 
+int Operations::testModelFromFileCTWedge(
+		vector<Operations::TestModel> &testModel, char *filename, int &nWise) {
+	ifstream myReadFile;
+	string strRow;
+	bool inParameters = false;
+	bool inConstraints = false;
+	// Open the CTWedge file
+	myReadFile.open(filename);
+	if (!myReadFile.is_open()) {
+		perror("Errore in apertura del file");
+		return -1; //errore
+	}
+
+	while (!myReadFile.eof()) {
+		getline(myReadFile, strRow);
+		// It's a comment
+		if (strRow.rfind("//", 0) == 0)
+			continue;
+		if (strRow.rfind("Parameters", 0) == 0) {
+			inParameters = true;
+			continue;
+		}
+		if (strRow.rfind("Constraints", 0) == 0) {
+			inParameters = false;
+			inConstraints = false;
+			continue;
+		}
+		if (inParameters) {
+			// Remove all the white spaces
+			strRow.erase(std::remove_if(strRow.begin(), strRow.end(), ::isspace),
+					strRow.end());
+
+			// Empty row
+			if (strRow == "")
+				continue;
+
+			// It's a parameter. We need to tokenize the string
+			boost::char_separator<char> sep(":");
+			boost::tokenizer<boost::char_separator<char>> tokens(strRow, sep);
+			string parameterName = "";
+			string parameterDef = "";
+			for (const auto& t : tokens) {
+				if (parameterName == "")
+					parameterName = t;
+				else
+					parameterDef = t;
+			}
+			Operations::TestModel pT;
+			pT.parameters = 1;
+			pT.name = parameterName;
+			if (parameterDef == "Boolean") {
+				// Boolean parameter
+				pT.values = vector<string> {"true", "false"};
+			} else {
+				if (parameterDef.rfind("{", 0) == 0) {
+					// Enumerative
+					pT.values = vector<string>();
+					parameterDef = parameterDef.substr(1, parameterDef.size() - 1);
+					boost::char_separator<char> sep(",");
+					boost::tokenizer<boost::char_separator<char>> tokens(parameterDef, sep);
+					for (const auto& t : tokens) {
+						pT.values.push_back(t);
+					}
+				} else {
+					cout << parameterDef << endl;
+					perror("Unrecognized parameter type");
+					return -1; //errore
+				}
+			}
+			pT.card = pT.values.size();
+			testModel.push_back(pT);
+			continue;
+		}
+		if (inConstraints) {
+			strRow = trim(strRow);
+
+			// The constraint shall begin with #
+			if (strRow.rfind("#", 0) != 0)
+				continue;
+			// Remove head and tail characters
+			strRow = strRow.substr(1, strRow.size() - 1);
+			strRow = trim(strRow);
+
+			// Build a tree for the constraint
+			ConstraintTree c;
+
+			// Tokenize the string based on blank spaces
+			boost::char_separator<char> sep(" ");
+			boost::tokenizer<boost::char_separator<char>> tokens(strRow, sep);
+
+		}
+	}
+	return 0;
+}
+
 int Operations::testModelConstraintsFromFileMEDICI(
 		vector<list<Operations::TestModelConstraint> > &testModel,
-		char* filename) {
+		char *filename) {
 	ifstream myReadFile;
 	string strRow;
 	uint N = 0;
-	uint nParam = 0;
 	/* apre il file */
 	myReadFile.open(filename);
 	if (!myReadFile.is_open()) {
@@ -183,7 +280,7 @@ int Operations::testModelConstraintsFromFileMEDICI(
 		perror("Errore in apertura del file");
 		return -1; //errore
 	}
-    //SALTO TRE RIGHE DI DEFINIZIONE MODELLO
+	//SALTO TRE RIGHE DI DEFINIZIONE MODELLO
 	getline(myReadFile, strRow);
 	getline(myReadFile, strRow);
 	getline(myReadFile, strRow);
@@ -198,15 +295,18 @@ int Operations::testModelConstraintsFromFileMEDICI(
 		for (uint k = 0; k < tokens.size(); k++) {
 			if (strcmp(tokens[k].c_str(), "-") == 0) {
 				// a value followed by a - add a negative
-				pTList.push_front(Operations::TestModelConstraint::makeOperation('-'));
+				pTList.push_front(
+						Operations::TestModelConstraint::makeOperation('-'));
 			} else if (strcmp(tokens[k].c_str(), "+") == 0) {
-				pTList.push_front(Operations::TestModelConstraint::makeOperation('+'));
+				pTList.push_front(
+						Operations::TestModelConstraint::makeOperation('+'));
 			} else if (strcmp(tokens[k].c_str(), "*") == 0) {
-				pTList.push_front(Operations::TestModelConstraint::makeOperation('*'));
+				pTList.push_front(
+						Operations::TestModelConstraint::makeOperation('*'));
 			} else {
 				//ï¿½ un numero
 				int value = atoi(tokens[k].c_str());
-				pTList.push_front(Operations::TestModelConstraint(value,true));
+				pTList.push_front(Operations::TestModelConstraint(value, true));
 			}
 		}
 #ifdef DEBUG
@@ -225,7 +325,7 @@ int Operations::testModelConstraintsFromFileMEDICI(
 }
 
 int Operations::testModelFromFile(vector<Operations::TestModel> &testModel,
-		char* filename, int &nWise) {
+		char *filename, int &nWise) {
 	ifstream myReadFile;
 	string strRow;
 	uint N = 0;
@@ -238,7 +338,7 @@ int Operations::testModelFromFile(vector<Operations::TestModel> &testModel,
 	}
 
 	getline(myReadFile, strRow); // Prima riga indica nwise
-	nWise=atoi(strRow.c_str()); //nWise
+	nWise = atoi(strRow.c_str()); //nWise
 	getline(myReadFile, strRow);
 	N = atoi(strRow.c_str()); //numero variabili, livelli
 	//	cout<<N<<endl;
@@ -300,7 +400,7 @@ double Operations::getCardinalityDifference(dd_edge edge, dd_edge mdd_edge) {
 	dd_edge tempElement = edge * mdd_edge;
 	// apply(INTERSECTION, edge,  mdd_edge, tempElement);
 	//double tCard = tempElement.getCardinality();
-	double tCard =tempElement.getCardinality();
+	double tCard = tempElement.getCardinality();
 //  tempElement.clear();
 //  int64 partial2=Operations::GetTimeMs64();
 
@@ -359,13 +459,13 @@ vector<string> Operations::tokenize(string str) {
 	return result;
 }
 
-dd_edge Operations::getMDDFromTuple(vector<cvalue> tupla, forest* mdd) {
+dd_edge Operations::getMDDFromTuple(vector<cvalue> tupla, forest *mdd) {
 	const uint N = tupla.size(); //n variabili o livelli
 
 	// Create an element to insert in the MDD
 	// Note that this is of size (N + 1), since [0] is a special level handle
 	// dedicated to terminal nodes.
-	int* elementList[1]; //matrice pairwise
+	int *elementList[1]; //matrice pairwise
 
 	elementList[0] = new int[N + 1];
 
@@ -388,13 +488,14 @@ dd_edge Operations::getMDDFromTuple(vector<cvalue> tupla, forest* mdd) {
 	return element;
 }
 
-void Operations::printElements(std::ostream& strm, dd_edge& e, int verbosity = 0) {
+void Operations::printElements(std::ostream &strm, dd_edge &e,
+		int verbosity = 0) {
 	int nLevels = ((e.getForest())->getDomain())->getNumVariables();
 	for (enumerator iter(e); iter; ++iter) {
-		const int* minterm = iter.getAssignments();
+		const int *minterm = iter.getAssignments();
 		strm << "[";
 		for (int i = nLevels; i > 0; i--) {
-			strm << " "<< minterm[i];
+			strm << " " << minterm[i];
 		}
 		switch ((e.getForest())->getRangeType()) {
 		case forest::BOOLEAN:
@@ -403,13 +504,13 @@ void Operations::printElements(std::ostream& strm, dd_edge& e, int verbosity = 0
 		case forest::INTEGER: {
 			int val = 0;
 			iter.getValue(val);
-			strm << " --> "<<val<<"]\n";
+			strm << " --> " << val << "]\n";
 		}
 			break;
 		case forest::REAL: {
 			int val = 0;
 			iter.getValue(val);
-			strm << " --> "<<val <<"]\n"; //&&%0.3f
+			strm << " --> " << val << "]\n"; //&&%0.3f
 		}
 			break;
 		default:
@@ -455,7 +556,6 @@ int64 Operations::getTimeMs64() {
 #endif
 }
 
-
 int Operations::isIncludedTuple(vector<cvalue> vCode, vector<cvalue> vCode2,
 		vector<int> vParams, int paramZero) {
 	int ret1 = 0;
@@ -486,7 +586,7 @@ int Operations::isIncludedTuple(vector<cvalue> vCode, vector<cvalue> vCode2,
 	return -1;
 }
 
-int Operations::toCASACodeConversion(vector<cvalue> &code, int* bounds) {
+int Operations::toCASACodeConversion(vector<cvalue> &code, int *bounds) {
 	uint size = code.size();
 	int parB = 0;
 	for (uint i = 0; i < size; i++) {
@@ -497,7 +597,7 @@ int Operations::toCASACodeConversion(vector<cvalue> &code, int* bounds) {
 	return 0;
 }
 
-int Operations::toCASAValueConversion(int index, int value, int* bounds,
+int Operations::toCASAValueConversion(int index, int value, int *bounds,
 		int size) {
 
 	int parB = 0;
@@ -516,10 +616,10 @@ int Operations::toCASAValueConversion(int index, int value, int* bounds,
 	//return -1;
 }
 
-int Operations::toACTSModelConversion(vector<Operations::TestModel> testModel, vector<list<Operations::TestModelConstraint> > testConstraints,
-		int* bounds, int nel, char* filename, char* modelname) {
+int Operations::toACTSModelConversion(vector<Operations::TestModel> testModel,
+		vector<list<Operations::TestModelConstraint> > testConstraints,
+		int *bounds, int nel, char *filename, char *modelname) {
 	ofstream fout;
-
 
 	/* apre il file */
 	fout.open(filename);
@@ -529,69 +629,71 @@ int Operations::toACTSModelConversion(vector<Operations::TestModel> testModel, v
 		return -1; //errore
 	}
 
-	fout<<"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"<<endl;
-	fout<<"<System name=\""<<modelname<<"\">"<<endl;
-	fout<<" <Parameters>"<<endl;
-	int i=0;
-	for (std::vector<Operations::TestModel>::iterator it = testModel.begin(), end = testModel.end();
-			it != end; ++it) {
-		fout<<"  "<<"<Parameter id=\""<<i<<"\" name=\"p"<<i<<"\" type=\"0\">"<<endl;
-	    fout<<"   <values>"<<endl;
-	    for (int k=0;k<it->card;k++)
-	    {
-	     fout<<"    <value>"<<k<<"</value>"<<endl;
-	    }
-	    fout<<"   </values>"<<endl;
-	    fout<<"   <basechoices>"<<endl;
-	    fout<<"   <basechoice />"<<endl;
-	    fout<<"   </basechoices>"<<endl;
-	    fout<<" </Parameter>"<<endl;
+	fout << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << endl;
+	fout << "<System name=\"" << modelname << "\">" << endl;
+	fout << " <Parameters>" << endl;
+	int i = 0;
+	for (std::vector<Operations::TestModel>::iterator it = testModel.begin(),
+			end = testModel.end(); it != end; ++it) {
+		fout << "  " << "<Parameter id=\"" << i << "\" name=\"p" << i
+				<< "\" type=\"0\">" << endl;
+		fout << "   <values>" << endl;
+		for (int k = 0; k < it->card; k++) {
+			fout << "    <value>" << k << "</value>" << endl;
+		}
+		fout << "   </values>" << endl;
+		fout << "   <basechoices>" << endl;
+		fout << "   <basechoice />" << endl;
+		fout << "   </basechoices>" << endl;
+		fout << " </Parameter>" << endl;
 
 		i++;
 	}
-	fout<<" </Parameters>"<<endl;
-	fout<<"<OutputParameters />"<<endl;
-	fout<<"<Relations />"<<endl;
-	fout<<" <Constraints>"<<endl;
-	for (std::vector<list<Operations::TestModelConstraint> > ::iterator itc = testConstraints.begin(), end = testConstraints.end();
-				itc != end; ++itc) {
+	fout << " </Parameters>" << endl;
+	fout << "<OutputParameters />" << endl;
+	fout << "<Relations />" << endl;
+	fout << " <Constraints>" << endl;
+	for (std::vector<list<Operations::TestModelConstraint> >::iterator itc =
+			testConstraints.begin(), end = testConstraints.end(); itc != end;
+			++itc) {
 		//vector di constraints uniti con and
-		fout<<"<Constraint text=\"";
-		int kz=0;
-		for (std::list<Operations::TestModelConstraint> ::iterator itcs = itc->begin(), end = itc->end();
-						itcs != end; ++itcs) {
+		fout << "<Constraint text=\"";
+		int kz = 0;
+		for (std::list<Operations::TestModelConstraint>::iterator itcs =
+				itc->begin(), end = itc->end(); itcs != end; ++itcs) {
 			//singolo valore della riga
-			int index=-1;
-			int value=-1;
-			Operations::getIndexAndValue(itcs->getValue(),bounds,nel,index,value);
-			if (kz>0)
-				fout<<"||";
-			fout<<"(p"<<index;
-			if (itcs->isNegative()) fout<<"!";
-			fout<<"="<<value<<")";
+			int index = -1;
+			int value = -1;
+			Operations::getIndexAndValue(itcs->getValue(), bounds, nel, index,
+					value);
+			if (kz > 0)
+				fout << "||";
+			fout << "(p" << index;
+			if (itcs->isNegative())
+				fout << "!";
+			fout << "=" << value << ")";
 
 			kz++;
 		}
-		fout<<"\">"<<endl;
-		fout<<"<Parameters>"<<endl;
-		for (std::list<Operations::TestModelConstraint> ::iterator itcs = itc->begin(), end = itc->end();
-				itcs != end; ++itcs) {
+		fout << "\">" << endl;
+		fout << "<Parameters>" << endl;
+		for (std::list<Operations::TestModelConstraint>::iterator itcs =
+				itc->begin(), end = itc->end(); itcs != end; ++itcs) {
 			//singolo valore della riga
-			int index=-1;
-			int value=-1;
-			Operations::getIndexAndValue(itcs->getValue(),bounds,nel,index,value);
-			fout<<"<Parameter name=\"p"<<index<<"\" />"<<endl;
+			int index = -1;
+			int value = -1;
+			Operations::getIndexAndValue(itcs->getValue(), bounds, nel, index,
+					value);
+			fout << "<Parameter name=\"p" << index << "\" />" << endl;
 
 		}
 
-		fout<<"</Parameters>"<<endl;
-		fout<<"</Constraint>"<<endl;
-
+		fout << "</Parameters>" << endl;
+		fout << "</Constraint>" << endl;
 
 	}
-	fout<<" </Constraints>"<<endl;
-	fout<<"</System>"<<endl;
-
+	fout << " </Constraints>" << endl;
+	fout << "</System>" << endl;
 
 	fout.close();
 	return 0;

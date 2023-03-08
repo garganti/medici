@@ -33,58 +33,62 @@ public:
 	struct TestModel {
 		int card;
 		int parameters;
+		string name;
+		vector<string> values;
 	};
 
 	class TestModelConstraint {
-		//NB per constraints medici + è operatore binario
+		//NB per constraints medici + ï¿½ operatore binario
 		// sign - can be an operation
 		char op; //0 false (-), 1 true (+), 2 (*)
 		int value;
-		TestModelConstraint(char op, int val)
-			:op(op),value(val){}
+		TestModelConstraint(char op, int val) :
+				op(op), value(val) {
+		}
 	public:
 		// to build a single asignment (/possibly negated)
-		TestModelConstraint(int val, bool pos){
+		TestModelConstraint(int val, bool pos) {
 			assert(val >= 0);
 			value = val;
 			// param = val
-			if (pos) op = '+';
+			if (pos)
+				op = '+';
 			// param != val
-			else op = '-';
+			else
+				op = '-';
 		}
 		// return true if it represents an operation
-		bool isOperation(){
-			return !(value>=0);
+		bool isOperation() {
+			return !(value >= 0);
 		}
-		bool isNegative(){
+		bool isNegative() {
 			assert(value != -1);
 			assert(op != '*');
 			return op == '-';
 		}
 
-		int getValue(){
+		int getValue() {
 			assert(value >= 0);
 			return value;
 		}
 		// return the operation
-		char getOp(){
+		char getOp() {
 			assert(value < 0);
 			return op;
 		}
 		// operation
-		static TestModelConstraint makeOperation(char op){
-			assert (op == '+' ||op == '-' ||op == '*');
-			return TestModelConstraint(op,-1);
+		static TestModelConstraint makeOperation(char op) {
+			assert(op == '+' || op == '-' || op == '*');
+			return TestModelConstraint(op, -1);
 		}
 
-		friend ostream& operator<< (ostream &out, TestModelConstraint &tmCon){
+		friend ostream& operator<<(ostream &out, TestModelConstraint &tmCon) {
 			if (tmCon.isOperation())
 				out << tmCon.op;
 			else
 				out << tmCon.op << tmCon.value;
 			return out;
 		}
-
 
 	};
 	/**
@@ -110,7 +114,7 @@ public:
 	 * @param mdd
 	 * @return mdd edge
 	 */
-	static dd_edge getMDDFromTuple(vector<cvalue> tupla, forest* mdd);
+	static dd_edge getMDDFromTuple(vector<cvalue> tupla, forest *mdd);
 	/**
 	 * Generate bounds in the meddly's format given a testmodel
 	 * @param 	Test model
@@ -124,7 +128,7 @@ public:
 	 * @param e edge
 	 * @param verbosity 0 print only the fist possible test case, otherwise all possible test cases
 	 */
-	static void printElements(ostream& strm, dd_edge& e, int verbosity);
+	static void printElements(ostream &strm, dd_edge &e, int verbosity);
 
 	/**
 	 * A simple string tokenizer
@@ -144,7 +148,7 @@ public:
 	 * @param file name
 	 * @return -1 error, 0 ok
 	 */
-	static int testModelFromFile(vector<TestModel> &, char *, int &nWise);
+	static int testModelFromFile(vector<TestModel>&, char*, int &nWise);
 	/**
 	 * Generate constraints model from file, given the file path
 	 * @param empty testmodelconstraints to compile
@@ -152,7 +156,7 @@ public:
 	 * @return -1 error, 0 ok
 	 */
 	static int testModelConstraintsFromFileCASA(
-			vector<list<TestModelConstraint> > &, char *); //ogni constraint è definito da una serie di parametri
+			vector<list<TestModelConstraint> >&, char*); //ogni constraint ï¿½ definito da una serie di parametri
 	/**
 	 * Generate constraints model from file, given the file path
 	 * @param empty testmodelconstraints to compile
@@ -160,7 +164,15 @@ public:
 	 * @return -1 error, 0 ok
 	 */
 	static int testModelConstraintsFromFileMEDICI(
-			vector<list<TestModelConstraint> > &, char *); //ogni constraint è definito da una serie di parametri
+			vector<list<TestModelConstraint> >&, char*); //ogni constraint ï¿½ definito da una serie di parametri
+
+	/**
+	 * Generate constraints model from file, given the file path
+	 * @param empty testmodelconstraints to compile
+	 * @param file name
+	 * @return -1 error, 0 ok
+	 */
+	static int testModelFromFileCTWedge(vector<TestModel>&, char*, int &nWise);
 
 	/**
 	 * Return the code (row of true table) given a single parameter and its value
@@ -170,8 +182,8 @@ public:
 	 * @param param index (returned)
 	 * @return vector of code generated
 	 */
-	static vector<cvalue> getCodeFromParameter(int, int*, int, int &);
-	static void getIndexAndValue(int,int*,int,int &,int &);
+	static vector<cvalue> getCodeFromParameter(int, int*, int, int&);
+	static void getIndexAndValue(int, int*, int, int&, int&);
 	/**
 	 * Return value in format (paraindex,value) from CASA value
 	 * @param v
@@ -180,8 +192,7 @@ public:
 	 * @return
 	 */
 
-
-	static vector<cvalue> getValueFromParameter(int v, int* bounds, int N);
+	static vector<cvalue> getValueFromParameter(int v, int *bounds, int N);
 	/**
 	 * Check if parameters in vector 2 are set in vector1 and if they're the same
 	 * @param vector1
@@ -192,8 +203,6 @@ public:
 	 */
 	static int isIncludedTuple(vector<cvalue>, vector<cvalue>, vector<int>,
 			int paramZero = -1);
-
-
 
 	/**
 	 * Get a true table row from an Mdd, if it has cardinality>1 it returns the first valid test case
@@ -208,7 +217,7 @@ public:
 	 * @param bounds
 	 * @return 0 ok
 	 */
-	static int toCASACodeConversion(vector<cvalue> &, int*);
+	static int toCASACodeConversion(vector<cvalue>&, int*);
 
 	/**
 	 * Given a couple of values in the format [paramindex,value] return the CASA value (no need of couple)
@@ -219,7 +228,9 @@ public:
 	 */
 	static int toCASAValueConversion(int, int, int*, int);
 
-	static int toACTSModelConversion(vector<TestModel>, vector<list<Operations::TestModelConstraint> >, int*,int,char * , char *);
+	static int toACTSModelConversion(vector<TestModel>,
+			vector<list<Operations::TestModelConstraint> >, int*, int, char*,
+			char*);
 
 	Operations();
 	virtual ~Operations();
