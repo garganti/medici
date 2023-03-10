@@ -168,11 +168,13 @@ public:
 
 	/**
 	 * Generate constraints model from file, given the file path
+	 * @param empty testmodel to compile
 	 * @param empty testmodelconstraints to compile
 	 * @param file name
 	 * @return -1 error, 0 ok
 	 */
-	static int testModelFromFileCTWedge(vector<TestModel>&, char*, int &nWise);
+	static int testModelFromFileCTWedge(vector<Operations::TestModel> &,
+			vector<list<Operations::TestModelConstraint> > &, char *);
 
 	/**
 	 * Return the code (row of true table) given a single parameter and its value

@@ -7,12 +7,14 @@
 
 #include "MEDICI.h"
 #include "logger.hpp"
+#include "header.h"
 
 // da FCC >= 4.7 uint non � pi� supportato: https://github.com/CRPropa/CRPropa3/issues/89
 #ifndef uint
 #define uint unsigned int
 #endif
 
+extern parameter_bimap valuesMap;
 
 MEDICI::MEDICI() {
 }
@@ -41,15 +43,20 @@ int MEDICI::normalMode(Settings setting, vector<int> &res) {
 	vector<Operations::TestModel> testModel;
 	vector<std::list<Operations::TestModelConstraint> > testModelC;
 	int nWise;
-	if (Operations::testModelFromFile(testModel, setting.model, nWise) == -1) {
-		cout << "Error reading file " << setting.model << endl;
+	if (!setting.useCTWedge) {
+		if (Operations::testModelFromFile(testModel, setting.model, nWise) == -1) {
+			cout << "Error reading file " << setting.model << endl;
+		}
+		if (strlen(setting.constraint) && (setting.casa))
+			Operations::testModelConstraintsFromFileCASA(testModelC,
+					setting.constraint);
+		else
+			Operations::testModelConstraintsFromFileMEDICI(testModelC,
+					setting.model);
+	} else {
+		Operations::testModelFromFileCTWedge(testModel, testModelC, setting.model);
+		nWise = setting.strength > 1 ? setting.strength : 2;
 	}
-	if (strlen(setting.constraint) && (setting.casa))
-		Operations::testModelConstraintsFromFileCASA(testModelC,
-				setting.constraint);
-	else
-		Operations::testModelConstraintsFromFileMEDICI(testModelC,
-				setting.model);
 	int nel = 0;
 	//Trovo numero parametri
 	for (std::vector<Operations::TestModel>::iterator it = testModel.begin(),
@@ -236,37 +243,49 @@ int MEDICI::normalMode(Settings setting, vector<int> &res) {
 	logcout(LOG_INFO) << "Tuple coperte: " << tupleList.nCovered << " Tuple da coprire: "
 			<< tupleList.nToCover << " Tuple non copribili: "
 			<< tupleList.nUncoverable << endl;
-	//cout << "Chiuso in : " << iterazioni-- << " iterazioni" << endl;
 	logcout(LOG_INFO) << "Ottenuti: " << minSize << " mdd" << endl;
 	logcout(LOG_INFO) << "Tempo per ordinamenti: " << partial << "ms" << endl;
 
 	// AG 03.08.23 mdd->garbageCollect();
-	//cout<<outputFile<<"***********"<<endl;
-	mddListBest.listToFile(setting.out, bounds);
-	//Salvataggio stats su file
-	ofstream fout;
+	// cout<<outputFile<<"***********"<<endl;
+	if (!setting.stdOut) {
+		mddListBest.listToFile(setting.out, bounds);
+		//Salvataggio stats su file
+		ofstream fout;
 
-	fout.open(outputStats);
+		fout.open(outputStats);
 
-	if (!fout.is_open()) {
+		if (!fout.is_open()) {
 
-		perror("Errore in apertura del file per stats");
-		return 0;
+			perror("Errore in apertura del file per stats");
+			return 0;
+		}
+		fout << "****Model name: " << setting.model << " *******" << endl;
+		fout << "Tuple coperte: " << tupleList.nCovered << " Tuple da coprire: "
+				<< tupleList.nToCover << " Tuple non copribili: "
+				<< tupleList.nUncoverable << endl;
+		fout << "Ottenuti: " << minSize << " mdd" << endl;
+		fout << "time execution script " << Operations::getTimeMs64() - now << "ms" << endl;
+		fout << "Tempo per ordinamenti: " << partial << "ms" << endl;
+
+		fout.close();
+	} else {
+		// First, print parameter names
+		threshold = LOG_INFO;
+		for (auto &param : testModel) {
+			logcout(LOG_INFO) << param.name << ";";
+		}
+		logcout(LOG_INFO) << endl;
+		// Then, print all the parameter values
+		logcout(LOG_INFO) << mddListBest.listToString(valuesMap, bounds);
+
+		threshold = LOG_NOTHING;
 	}
-	fout << "****Model name: " << setting.model << " *******" << endl;
-	fout << "Tuple coperte: " << tupleList.nCovered << " Tuple da coprire: "
-			<< tupleList.nToCover << " Tuple non copribili: "
-			<< tupleList.nUncoverable << endl;
-	//fout << "Chiuso in : " << iterazioni-- << " iterazioni" << endl;
-	//fout << "Ottenuti: " << mddList.list.size() - 1 << " mdd" << endl;
-	fout << "Ottenuti: " << minSize << " mdd" << endl;
-	fout << "time execution script " << Operations::getTimeMs64() - now << "ms" << endl;
-	fout << "Tempo per ordinamenti: " << partial << "ms" << endl;
 
-	fout.close();
-
+	//AB 03.08.23
 	//destroyDomain(d);
 
+	//AB 03.08.23
 	//cleanup();
 
 	logcout(LOG_INFO) << "time execution script " << Operations::getTimeMs64() - now << "ms"

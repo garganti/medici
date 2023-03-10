@@ -12,7 +12,7 @@
 
 static nullstream lognullstream;
 
-log_level_t threshold = LOG_DEBUG;
+log_level_t threshold = LOG_ERROR;
 
 std::ostream& logcout(log_level_t x) {
 	return ((x <= threshold) ? std::cout : lognullstream);

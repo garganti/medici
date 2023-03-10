@@ -10,7 +10,7 @@
 #include "logger.hpp"
 #include <sstream>
 
-// da FCC >= 4.7 uint non è più supportato
+// da FCC >= 4.7 uint non ï¿½ piï¿½ supportato
 #ifndef uint
 #define uint unsigned int
 #endif
@@ -56,7 +56,7 @@ void MDDList::updateCovered(int mddIndex, TupleList &listT, int mode) {
 			listT.tList.end(); it != end; ++it) {
 
 		//dd_edge node2 = it->node;
-		if (!it->status) //Se è già coperta non serve
+		if (!it->status) //Se ï¿½ giï¿½ coperta non serve
 		{
 			if (Operations::isIncludedTuple(code, it->code, it->param) == 1) {
 				if (mode == 0) {
@@ -76,8 +76,8 @@ int MDDList::checkForParameter(vector<int> it2, Tuple &tupla, int* bounds,
 		int &randomPar) {
 	int nParams = mdd->getDomain()->getNumVariables();
 	bool debug = false;
-	int var; //= mdd->getDomain()->getVariableBound(paramI+1,false); //cardinalità parametro paramI
-	int paramI = it2.at(0); //index originale, mentre a 1 c'è il peso associato
+	int var; //= mdd->getDomain()->getVariableBound(paramI+1,false); //cardinalitï¿½ parametro paramI
+	int paramI = it2.at(0); //index originale, mentre a 1 c'ï¿½ il peso associato
 	var = bounds[nParams - paramI - 1];
 #ifdef DEBUG2
 	cout<<"PARAMI "; //TODO remove
@@ -92,7 +92,7 @@ int MDDList::checkForParameter(vector<int> it2, Tuple &tupla, int* bounds,
 	double maxVarStep2 = 0;
 	double countVarStep1 = 0; //contatore temporaneo
 	double countVarStep2 = 0;
-//	int maxVarStep1Value = -1; //valore del parametro che inserisce più tuple
+//	int maxVarStep1Value = -1; //valore del parametro che inserisce piï¿½ tuple
 	int maxVarStep2Value = -1;
 	vector<int> maxVarStep1ValueS;
 //	vector<int> maxVarStep2ValueS;
@@ -119,9 +119,9 @@ int MDDList::checkForParameter(vector<int> it2, Tuple &tupla, int* bounds,
 				listT.tList.end(); it2 != end; ++it2) {
 			//Sfoglio lista tuple
 			if (it2->status == 1)
-				continue; //è già coperta
+				continue; //ï¿½ giï¿½ coperta
 			if (it2->code[paramI] != i)
-				continue; //non è compatibile o non include il parametro
+				continue; //non ï¿½ compatibile o non include il parametro
 			if (toCheck) {
 				nodeTmp *= list[mddIndex].node;
 				//	mdd->removeAllComputeTableEntries();
@@ -144,17 +144,17 @@ int MDDList::checkForParameter(vector<int> it2, Tuple &tupla, int* bounds,
 			}
 
 			//		countVar+=Operations::getIntersectionCardinality(node2,nodeTmp);
-			//Questo test impiega troppo tempo node2 è la tupla e ok, nodeTmp è il modello con constraints, provare con uno vuoto solo con parametri fissati?
+			//Questo test impiega troppo tempo node2 ï¿½ la tupla e ok, nodeTmp ï¿½ il modello con constraints, provare con uno vuoto solo con parametri fissati?
 			tupla.code[paramI] = i; //cambio temporaneo per check
 			int isIncluded = Operations::isIncludedTuple(tupla.code, it2->code,
 					it2->param);
 			tupla.code[paramI] = -1;
-			if (isIncluded == 1) { //Già inclusa
+			if (isIncluded == 1) { //Giï¿½ inclusa
 				//if (countVarStep1<it2->weightMax) countVarStep1=it2->weightMax;
 				countVarStep1 += (it2->weight); //*(it2->weight);//*(it2->weight)*(it2->weight);
 			} else if (isIncluded == 2) {
 				//Provo a tagliare questo pezzo per eseguirlo solo dopo?
-				if (countVarStep1 <= 0) //non eseguo se c'è già step1 fissato, ottimizza però lo usavo in caso di parità di countvar1... qualche dato però mi resta perchè qualche volta lo eseguo lo stesso
+				if (countVarStep1 <= 0) //non eseguo se c'ï¿½ giï¿½ step1 fissato, ottimizza perï¿½ lo usavo in caso di paritï¿½ di countvar1... qualche dato perï¿½ mi resta perchï¿½ qualche volta lo eseguo lo stesso
 						{
 
 #ifdef DEBUG2
@@ -163,7 +163,7 @@ int MDDList::checkForParameter(vector<int> it2, Tuple &tupla, int* bounds,
 #endif
 					if (paramIt == 0) {
 						countVarStep2 += it2->weight;
-					} //primo parametro è sempre compatibile
+					} //primo parametro ï¿½ sempre compatibile
 					else
 					//if (paramIt==0) //controllo solo in caso di primo parametro
 					{
@@ -217,7 +217,7 @@ int MDDList::checkForParameter(vector<int> it2, Tuple &tupla, int* bounds,
 				 cout<<countVarStep2<<endl;
 				 #endif
 				 maxVarStep2 = countVarStep2;
-				 //maxVarStep1=countVarStep1; //non serve è già uguale per ipotesi
+				 //maxVarStep1=countVarStep1; //non serve ï¿½ giï¿½ uguale per ipotesi
 				 if (countVarStep2>maxVarStep2)
 				 maxVarStep1ValueS.clear();
 				 maxVarStep1ValueS.push_back(i);
@@ -241,7 +241,7 @@ int MDDList::checkForParameter(vector<int> it2, Tuple &tupla, int* bounds,
 
 		}
 	}
-	//uscito dal ciclo avrò un valore da fissare per il parametro
+	//uscito dal ciclo avrï¿½ un valore da fissare per il parametro
 	//   cout<<"FISSO "<<maxVarValue<<" con n tuple compatibili: "<<maxVar<<endl;
 	randomPar = maxVarStep1ValueS.size(); //da 2 in su ho fatto scelta random
 	if (maxVarStep1ValueS.size() > 0) {
@@ -259,7 +259,7 @@ int MDDList::checkForParameter(vector<int> it2, Tuple &tupla, int* bounds,
 	cout<<"Maxvar2/1: "<<maxVarStep2<<"/"<<maxVarStep1<<endl;
 #endif
 	if ((maxVarStep2 + maxVarStep1) == 0)
-		return 0; //-1 se fissare quel parametro non copre e non coprirà mai niente
+		return 0; //-1 se fissare quel parametro non copre e non coprirï¿½ mai niente
 	if (maxVarStep1 > 0)
 		return maxVarStep1;
 	else
@@ -343,14 +343,14 @@ void MDDList::updateConstraints(
 			tP = Operations::getMDDFromTuple(code, mdd);
 			//tP.show(stdout,3); //TODO debug
 			//	cout<<"------------"<<endl;
-			//cout<<"Cardinalità codice "<<it2->value<<" uguale a: "<<tP.getCardinality()<<endl;
+			//cout<<"Cardinalitï¿½ codice "<<it2->value<<" uguale a: "<<tP.getCardinality()<<endl;
 			if (it2.isNegative()) {
 
 				//	cout<<"segno negativo "<<endl;
-				//	cout<<"Cardinalità nodo vuoto "<<nodoVuoto.getCardinality()<<endl;
+				//	cout<<"Cardinalitï¿½ nodo vuoto "<<nodoVuoto.getCardinality()<<endl;
 				//			nodoVuoto.show(stdout,3);
 				tP = nodoVuoto - tP; //fare il complementare
-				//	cout<<"Cardinalità codice "<<it2->value<<" modificata da not uguale a: "<<tP.getCardinality()<<endl;
+				//	cout<<"Cardinalitï¿½ codice "<<it2->value<<" modificata da not uguale a: "<<tP.getCardinality()<<endl;
 			}
 			//ho finito di crearlo unisco a C
 			c += tP;
@@ -358,9 +358,9 @@ void MDDList::updateConstraints(
 		}
 		//ho il mio constraint
 		//c.show(stdout,3);
-		logcout(LOG_INFO) << "Cardinalità del constraint " << c.getCardinality() << endl;
+		logcout(LOG_INFO) << "Cardinalitï¿½ del constraint " << c.getCardinality() << endl;
 
-		listConstraints.push_back( { c, params }); //params è la lista dei parametri che include il constraint
+		listConstraints.push_back( { c, params }); //params ï¿½ la lista dei parametri che include il constraint
 		nodoBase *= c; //AND con nodobase per attivare constraint
 		logcout(LOG_INFO) << "Cardinalita ridotta con constraint " << i++ << " "
 				<< nodoBase.getCardinality() << endl; //TODO debug
@@ -389,7 +389,7 @@ void MDDList::updateConstraints(
 	//nodoBase=nodoBase-c; //proviamo differenza
 	logcout(LOG_INFO) << "Creo lista semplice" << endl;
 	//uso la constraintsIndexList per sapere gli mdd da generare per i constraints
-//	createConstraintsMddList(tList.constraintsIndexList); //TODO tolto non cambiava i tempi, la frammentazione è il massimo
+//	createConstraintsMddList(tList.constraintsIndexList); //TODO tolto non cambiava i tempi, la frammentazione ï¿½ il massimo
 //	nodoBase.show(stdout,3);
 
 }
@@ -473,7 +473,7 @@ void MDDList::updateConstraintsMEDICI(
 			}
 			//nodoVuoto.show(stdout,3);
 			//	cout<<"------------"<<endl;
-			//	cout<<"Cardinalità codice "<<it2->value<<" uguale a: "<<tP.getCardinality()<<endl;
+			//	cout<<"Cardinalitï¿½ codice "<<it2->value<<" uguale a: "<<tP.getCardinality()<<endl;
 		}
 		//ho finito di crearlo unisco a C
 		//controllo che sia stato definito bene, lista deve avere un elemento solo
@@ -487,9 +487,9 @@ void MDDList::updateConstraintsMEDICI(
 
 		//ho il mio constraint
 		//c.show(stdout,3);
-		//cout<<"Cardinalità del constraint "<<c.getCardinality()<<endl;
+		//cout<<"Cardinalitï¿½ del constraint "<<c.getCardinality()<<endl;
 
-		listConstraints.push_back( { c, params }); //params è la lista dei parametri che include il constraint
+		listConstraints.push_back( { c, params }); //params ï¿½ la lista dei parametri che include il constraint
 		nodoBase *= c; //AND con nodobase per attivare constraint
 		logcout(LOG_INFO) << "Cardinalita ridotta con constraint " << i++ << " "
 				<< nodoBase.getCardinality() << endl; //TODO debug
@@ -518,7 +518,7 @@ void MDDList::updateConstraintsMEDICI(
 	//nodoBase=nodoBase-c; //proviamo differenza
 	logcout(LOG_INFO) << "Creo lista semplice" << endl;
 	//uso la constraintsIndexList per sapere gli mdd da generare per i constraints
-//	createConstraintsMddList(tList.constraintsIndexList); //TODO tolto non cambiava i tempi, la frammentazione è il massimo
+//	createConstraintsMddList(tList.constraintsIndexList); //TODO tolto non cambiava i tempi, la frammentazione ï¿½ il massimo
 //	nodoBase.show(stdout,3);
 
 }
@@ -536,7 +536,7 @@ bool MDDList::mergeConstraints() {
 		//iterator su lista parametri, questo posso evitarlo facendo il merge dei vector e vedendo se size>0
 		//for (std::vector < int >::iterator it2 = it->params.begin(), end = it->params.end(); it2 != end; ++it2)
 		//{
-		//controllo se ho già inserito un mdd compatibile -> iterator su lCNew NB il primo lo mette pure se c'è già ma fa niente
+		//controllo se ho giï¿½ inserito un mdd compatibile -> iterator su lCNew NB il primo lo mette pure se c'ï¿½ giï¿½ ma fa niente
 		std::sort(it->params.begin(), it->params.end());
 		it->params.erase(std::unique(it->params.begin(), it->params.end()),
 				it->params.end());
@@ -556,8 +556,8 @@ bool MDDList::mergeConstraints() {
 			if (res.size() > 0) {
 				comp = true;
 				//	 cout<<"TROVATA intersezione valida di dimensione "<<res.size()<<endl;
-				//è compatibile aggiungo qui
-				//NB potrebbe essere compatibile con più di uno e in quel caso devo mischiarli di nuovo, ripassando il ciclo
+				//ï¿½ compatibile aggiungo qui
+				//NB potrebbe essere compatibile con piï¿½ di uno e in quel caso devo mischiarli di nuovo, ripassando il ciclo
 				it3->node *= it->node; //faccio intersezione per nodo e merge per vector prametri
 				//DEBUG
 				//  	 cout<<"set union tra "<<it->params.size()<<" e "<<it3->params.size()<<endl;
@@ -582,15 +582,15 @@ bool MDDList::mergeConstraints() {
 				// cout<<endl;
 				std::sort(it->params.begin(), it->params.end());
 				// it->params.erase(std::unique(it->params.begin(), it->params.end()), it->params.end());
-				//RIORDINO ed elimino doppi, merge elimina già doppi e probabilmente riordina anche
+				//RIORDINO ed elimino doppi, merge elimina giï¿½ doppi e probabilmente riordina anche
 				break;//non mi serve andare avanti ho trovato compatibile
 			}
 
 		}
-		if (!comp) //non è compatibile con nessuno, aggiungo nuovo
+		if (!comp) //non ï¿½ compatibile con nessuno, aggiungo nuovo
 		{
 
-			//cout<<"NON è compatibile con nessuno creo nuovo"<<endl;
+			//cout<<"NON ï¿½ compatibile con nessuno creo nuovo"<<endl;
 			lCNew.push_back(*it);
 		}
 		//}
@@ -633,7 +633,7 @@ int MDDList::checkCoverable(forest* mdd, TupleList &tupleList) {
 	int i2 = 0;
 	for (std::list<Tuple>::iterator it = tupleList.tList.begin(), end =
 			tupleList.tList.end(); it != end; ++it) {
-		//Aggiungo check preliminare che può evitare il resto del controllo
+		//Aggiungo check preliminare che puï¿½ evitare il resto del controllo
 
 		vector<int> res;
 		i2 = 0;
@@ -671,7 +671,7 @@ int MDDList::checkCoverable(forest* mdd, TupleList &tupleList) {
 						//	cout<<it->node.getCardinality()<<" card node constraint "<<endl;
 						//	cout<<base.getCardinality()<<" card ridotta"<<endl;
 					}
-					//c'è qualche parametro in comune
+					//c'ï¿½ qualche parametro in comune
 					changed = true;
 
 				}
@@ -720,11 +720,11 @@ int MDDList::listToFile(char* filename, int *bounds) {
 	fout << list.size() - 1 << endl;
 	//printValue(lista)<<endl; //scrive valore e va a capo
 
-	for (uint z = 0; z < list.size() - 1; z++) //ultimo è sempre uno vuoto
+	for (uint z = 0; z < list.size() - 1; z++) //ultimo ï¿½ sempre uno vuoto
 			{
 		vector<cvalue> code = Operations::getCodeFromMdd(list[z].node);
 		Operations::toCASACodeConversion(code, bounds);
-		for (uint k = 0; k < code.size(); k++) //ultimo è sempre uno vuoto
+		for (uint k = 0; k < code.size(); k++) //ultimo ï¿½ sempre uno vuoto
 				{
 			fout << code[k] << " ";
 		}
@@ -733,6 +733,20 @@ int MDDList::listToFile(char* filename, int *bounds) {
 	}
 	fout.close();
 	return 0;
+}
+
+string MDDList::listToString(parameter_bimap parameterValues,
+		int *bounds) {
+	string res = "";
+	for (uint z = 0; z < list.size() - 1; z++) {
+		vector<cvalue> code = Operations::getCodeFromMdd(list[z].node);
+		Operations::toCASACodeConversion(code, bounds);
+		for (uint k = 0; k < code.size(); k++) {
+			res = res + parameterValues.right.find(code[k])->second.second + ";";
+		}
+		res = res + '\n';
+	}
+	return res;
 }
 
 MDDList MDDList::listFromFile(char* filename, int *bounds, int nel,
@@ -800,15 +814,15 @@ int MDDList::addOther2b(TupleList &listT, int* bounds, int tries) //bounds non d
 			break; //arrivato a 0
 
 		if (it->status == 1)
-			continue; //è già coperta
-		//non è coperta quindi da questa genero sicuramente un caso di test
+			continue; //ï¿½ giï¿½ coperta
+		//non ï¿½ coperta quindi da questa genero sicuramente un caso di test
 		if (tI == 0) {
 			//Aggiungo mdd
 			//prima ne aggiungo uno vuoto in coda
 
-			//ora aggiungo a quello che è ora il penultimo elemento la tupla
+			//ora aggiungo a quello che ï¿½ ora il penultimo elemento la tupla
 			aggiungiAt(mddIndex, it->code); //TODO da rimettere
-			listT.setCovered(*it); //è in mdd quindi setto coperta
+			listT.setCovered(*it); //ï¿½ in mdd quindi setto coperta
 			list[mddIndex].nCoveredMdd++;
 			list[mddIndex].tWeight += it->weight;
 			double wmax = 0;
@@ -839,14 +853,14 @@ int MDDList::addOther2b(TupleList &listT, int* bounds, int tries) //bounds non d
 			nTupleInit--;
 			tI++;
 		} else { //non usato
-			//ho già una tupla inserita, test compatibilità
+			//ho giï¿½ una tupla inserita, test compatibilitï¿½
 			dd_edge node2 = Operations::getMDDFromTuple(it->code, mdd);
 			double cardDiffTmp = Operations::getCardinalityDifference(node2,
 					list[mddIndex].node);
 			//		cout<<"CHIAMATA a getCARDDIFF"<<endl;
 			//MODIFICA, DECIDO IN BASE A QUELLO CHE CAMBIA MENO LA CARDINALITA
 			if (cardDiffTmp > 0) {
-				//è compatibile
+				//ï¿½ compatibile
 				aggiungiAt(mddIndex, it->code);
 				logcout(LOG_INFO) << "Aggiungo tupla: " << it->getValue() << endl;
 				tupla = Tuple::mergeTuple(tupla, *it);
@@ -905,8 +919,8 @@ int MDDList::addOther2b(TupleList &listT, int* bounds, int tries) //bounds non d
 			restart = false;
 			indexListTC.clear();
 			/**
-			 * RIORDINARE indexListTMP mettendo prima i parametri che interagiscono con i già fissati
-			 ultimo dei fissati, il più pesante, solo una volta?
+			 * RIORDINARE indexListTMP mettendo prima i parametri che interagiscono con i giï¿½ fissati
+			 ultimo dei fissati, il piï¿½ pesante, solo una volta?
 			 */
 
 			coverable = false;
@@ -922,10 +936,10 @@ int MDDList::addOther2b(TupleList &listT, int* bounds, int tries) //bounds non d
 				//devo modificare per passare ad altri parametri in base a quello che decido per primo
 				int paramI = it2->at(0);
 				if (tupla.code[paramI] > -1)
-					continue; //parametro già fissato
+					continue; //parametro giï¿½ fissato
 				//trovato parametro non fissato
 				if (it2->at(1) == 0) {
-					//non coinvolge nessuna tupla e quindi essendo ordinati è così
+					//non coinvolge nessuna tupla e quindi essendo ordinati ï¿½ cosï¿½
 					//anche per i successivi, esco
 					break;
 				}
@@ -954,7 +968,7 @@ int MDDList::addOther2b(TupleList &listT, int* bounds, int tries) //bounds non d
 					tupla.code[paramI] = -1;
 					continue;
 
-				}		//salto senza riprenderlo, fissarlo è controproducente
+				}		//salto senza riprenderlo, fissarlo ï¿½ controproducente
 				if ((nCoverable > 0) || ((paramIt < 1) && (paramZero > 0))) {
 					//cout<<"AGGIORNO"<<endl;
 #ifdef DEBUG2
@@ -979,14 +993,14 @@ int MDDList::addOther2b(TupleList &listT, int* bounds, int tries) //bounds non d
 					coverable = true;
 				} else {
 					//quelli che salto li devo riprendere
-					it2->at(1) = (0 - nCoverable); //assegno preso secondario e le riodino così
+					it2->at(1) = (0 - nCoverable); //assegno preso secondario e le riodino cosï¿½
 					indexListTC.push_back(*it2);
 					//ordino per un parametro che gli ho associato, cambio it2->at(1) che indica il peso
 #ifdef DEBUG2
 					cout<<"SALTO PARAMETRO-VALORE: "<<paramI<<"-"<<tupla.code[paramI]<<endl;
 #endif
 					tupla.code[paramI] = -1;
-					coverable = true; //quelli che proprio non vanno bene sono già esclusi
+					coverable = true; //quelli che proprio non vanno bene sono giï¿½ esclusi
 				}
 				paramIt++;
 
@@ -1002,7 +1016,7 @@ int MDDList::addOther2b(TupleList &listT, int* bounds, int tries) //bounds non d
 		//TODO debug stampo codice ridotto
 		logcout(LOG_INFO) << mddIndex << endl;
 		tupla.print(logcout(LOG_INFO));
-		//saturo mdd a un caso di test valido anche nel caso abbia cardinalità maggiore
+		//saturo mdd a un caso di test valido anche nel caso abbia cardinalitï¿½ maggiore
 		vector<cvalue> code = Operations::getCodeFromMdd(list[mddIndex].node);
 		codes.push_back(code);
 		list[mddIndex].node = Operations::getMDDFromTuple(code, mdd);

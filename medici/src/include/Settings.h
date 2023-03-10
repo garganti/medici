@@ -22,10 +22,14 @@ public:
     int nit1;
     //
     int nit2;
+    //
+    int strength = 0;
     double wexp;
     double wexp2;
     bool casa;
+    bool stdOut;
     bool actsconv;
+    bool useCTWedge;
     bool validate;
     bool autovalidate;
     bool donotgenerate; // build MDD but do not generate

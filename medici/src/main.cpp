@@ -23,7 +23,9 @@ int main(int argc, char *argv[]) {
 		desc.add_options()
 	            		(HELP, "produce help message")
 	            		("casa",  "set input in casa format")
+						("ctw", "set input in CTWedge format")
 	            		("m", po::value<string>(), "set model file name")
+						("out", "print resulting test suite on standard output")
 	            		("o", po::value<string>(), "set output file name")
 	            		("c", po::value<string>(), "set constraints file name, only for casa mode")
 	            		("actsconv", "enable acts model conversion mode")
@@ -34,6 +36,7 @@ int main(int argc, char *argv[]) {
 	            		(DONOTGENERATE, "build mdds but do not generate test suite")
 	            		("mintries", po::value<int>(), "set mintries [1]")
 	            		("tries", po::value<int>(), "set max tries [1]")
+						("t", po::value<int>(), "set the strength")
 	            		("bettertries", po::value<int>(), "set number of better tries [1]")
 	            		("noqueuecheck", "disable check the queue for early termination")
 	            		("nit1", po::value<int>(), "set iterations over threshold [1]")
@@ -52,18 +55,25 @@ int main(int argc, char *argv[]) {
 		}
 
 		if (vm.count("casa")) {
-			cout << "Casa mode enabled \n";
+			logcout(LOG_INFO) << "Casa mode enabled \n";
 			setting.casa=true;
 			// << vm["compression"].as<double>() << ".\n";
 		}
+		if (vm.count("ctw")) {
+			logcout(LOG_INFO)  << "CTWedge mode enabled \n";
+			setting.useCTWedge=true;
+		}
+		if (vm.count("out")) {
+			setting.stdOut=true;
+		}
 		if (vm.count("validate")) {
-			cout << "Validating mode enabled \n";
+			logcout(LOG_INFO)  << "Validating mode enabled \n";
 			setting.validate=true;
 			MEDICI::validateMode(setting);
 
 		}
 		else if (vm.count("actsconv")) {
-			cout << "ACTS model conversion enabled \n";
+			logcout(LOG_INFO)  << "ACTS model conversion enabled \n";
 			setting.actsconv=true;
 			if (vm.count("mname")) {
 				strcpy(setting.mname,vm["o"].as<string>().c_str());
@@ -74,7 +84,7 @@ int main(int argc, char *argv[]) {
 			//NORMAL MODE
 			//cout<<"NORMAL MODE \n";
 			if (!(vm.count("m"))) {
-				cout<<"Model not set \n";
+				logcout(LOG_ERROR) <<"Model not set \n";
 				return 0;
 			}
 			strcpy(setting.model,vm["m"].as<string>().c_str());
@@ -133,8 +143,9 @@ int main(int argc, char *argv[]) {
 			if (vm.count("wexp2")) {
 				setting.wexp2=vm["wexp2"].as<double>();
 			}
-
-
+			if (vm.count("t")) {
+				setting.strength=vm["t"].as<int>();
+			}
 			MEDICI::normalMode(setting, res);
 		}
 	}

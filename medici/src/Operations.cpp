@@ -6,9 +6,12 @@
  */
 #include "header.h"
 #include "logger.hpp"
-#include "ConstraintTree.h"
+#include "ConstraintsParser.h"
 #include <string>
 #include <boost/tokenizer.hpp>
+
+// Map for the parameters
+parameter_bimap valuesMap;
 
 // da FCC >= 4.7 uint non � pi� supportato: https://github.com/CRPropa/CRPropa3/issues/89
 #ifndef uint
@@ -173,11 +176,15 @@ int Operations::testModelConstraintsFromFileCASA(
 }
 
 int Operations::testModelFromFileCTWedge(
-		vector<Operations::TestModel> &testModel, char *filename, int &nWise) {
+		vector<Operations::TestModel> &testModel,
+		vector<list<Operations::TestModelConstraint> > &testModelConstraints, char *filename) {
 	ifstream myReadFile;
 	string strRow;
 	bool inParameters = false;
 	bool inConstraints = false;
+	// Parameter counter
+	int counter = 0;
+
 	// Open the CTWedge file
 	myReadFile.open(filename);
 	if (!myReadFile.is_open()) {
@@ -196,7 +203,7 @@ int Operations::testModelFromFileCTWedge(
 		}
 		if (strRow.rfind("Constraints", 0) == 0) {
 			inParameters = false;
-			inConstraints = false;
+			inConstraints = true;
 			continue;
 		}
 		if (inParameters) {
@@ -224,7 +231,11 @@ int Operations::testModelFromFileCTWedge(
 			pT.name = parameterName;
 			if (parameterDef == "Boolean") {
 				// Boolean parameter
-				pT.values = vector<string> {"true", "false"};
+				pT.values = vector<string> {"false", "true"};
+				valuesMap.insert({make_pair(parameterName, "false"), counter});
+				counter++;
+				valuesMap.insert({make_pair(parameterName, "true"), counter});
+				counter++;
 			} else {
 				if (parameterDef.rfind("{", 0) == 0) {
 					// Enumerative
@@ -233,6 +244,8 @@ int Operations::testModelFromFileCTWedge(
 					boost::char_separator<char> sep(",");
 					boost::tokenizer<boost::char_separator<char>> tokens(parameterDef, sep);
 					for (const auto& t : tokens) {
+						valuesMap.insert({make_pair(parameterName, t), counter});
+						counter++;
 						pT.values.push_back(t);
 					}
 				} else {
@@ -252,16 +265,46 @@ int Operations::testModelFromFileCTWedge(
 			if (strRow.rfind("#", 0) != 0)
 				continue;
 			// Remove head and tail characters
-			strRow = strRow.substr(1, strRow.size() - 1);
-			strRow = trim(strRow);
+			strRow = strRow.substr(1, strRow.size() - 2);
+			strRow = trim(strRow) + ";";
 
-			// Build a tree for the constraint
-			ConstraintTree c;
+			// Parse the row with a constraint parser
+			parser<decltype(std::begin(strRow))> p;
+			try {
+				expr result;
+				bool ok = qi::phrase_parse(std::begin(strRow), std::end(strRow), p > ';', qi::space, result);
 
-			// Tokenize the string based on blank spaces
-			boost::char_separator<char> sep(" ");
-			boost::tokenizer<boost::char_separator<char>> tokens(strRow, sep);
-
+				if (!ok) {
+					perror("Error in parsing constraint");
+					return -1; //errore
+				} else {
+					// Use the parsed string
+					vector<string> tokens = Operations::tokenize(boost::apply_visitor(printer(), result));
+					list<Operations::TestModelConstraint> pTList;
+					for (uint k = 0; k < tokens.size(); k++) {
+						if (strcmp(tokens[k].c_str(), "-") == 0) {
+							// A value followed by a - add a negative
+							pTList.push_front(
+									Operations::TestModelConstraint::makeOperation('-'));
+						} else if (strcmp(tokens[k].c_str(), "+") == 0) {
+							pTList.push_front(
+									Operations::TestModelConstraint::makeOperation('+'));
+						} else if (strcmp(tokens[k].c_str(), "*") == 0) {
+							pTList.push_front(
+									Operations::TestModelConstraint::makeOperation('*'));
+						} else {
+							// It's a number
+							int value = atoi(tokens[k].c_str());
+							pTList.push_front(Operations::TestModelConstraint(value, true));
+						}
+					}
+					// The constraint has been fully managed
+					testModelConstraints.push_back(pTList);
+				}
+			} catch (const qi::expectation_failure<std::string> &e) {
+				perror("Error in parsing constraint");
+				return -1; //errore
+			}
 		}
 	}
 	return 0;

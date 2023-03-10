@@ -10,6 +10,7 @@
 
 #include "TupleList.h"
 #include <ostream>
+#include "header.h"
 
 using namespace std;
 using namespace MEDDLY;
@@ -83,6 +84,14 @@ public:
 	 * @return -1 error, 0 ok
 	 */
 	int listToFile(char *, int*);
+
+	/**
+	 * Save the test cases list to string
+	 * @param parameter mapping
+	 * @param bounds
+	 * @return -1 error, 0 ok
+	 */
+	string listToString(parameter_bimap, int *);
 
 	/**
 	 * Add an MDD to the list, constraints are added, if any
