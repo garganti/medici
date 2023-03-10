@@ -240,7 +240,7 @@ int Operations::testModelFromFileCTWedge(
 				if (parameterDef.rfind("{", 0) == 0) {
 					// Enumerative
 					pT.values = vector<string>();
-					parameterDef = parameterDef.substr(1, parameterDef.size() - 1);
+					parameterDef = parameterDef.substr(1, parameterDef.size() - 2);
 					boost::char_separator<char> sep(",");
 					boost::tokenizer<boost::char_separator<char>> tokens(parameterDef, sep);
 					for (const auto& t : tokens) {
