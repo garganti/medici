@@ -92,23 +92,24 @@ struct printer: boost::static_visitor<std::string> {
 		std::string parName = boost::apply_visitor(*this, b.oper1);
 		std::string parValue = boost::apply_visitor(*this, b.oper2);
 		std::pair<std::string, std::string> key = make_pair(parName, parValue);
-		return std::to_string(valuesMap.left.find(key)->second)+ " -";
+		return std::to_string(valuesMap.left.find(key)->second) + " -";
 	}
 	std::string operator()(const binop<op_impl> &b) const {
-		struct unop<op_not> notA (b.oper1);
-		struct binop<op_or> orB (notA, b.oper2);
-		return boost::apply_visitor(*this, (expr)orB);
+		struct unop<op_not> notA(b.oper1);
+		struct binop<op_or> orB(notA, b.oper2);
+		return boost::apply_visitor(*this, (expr) orB);
 	}
 	std::string operator()(const binop<op_dblimpl> &b) const {
-		struct unop<op_not> notA (b.oper1);
-		struct unop<op_not> notB (b.oper2);
-		struct binop<op_and> aAndB (b.oper1, b.oper2);
-		struct binop<op_and> notAAndNotB (notA, notB);
-		struct binop<op_or> res (aAndB, notAAndNotB);
-		return boost::apply_visitor(*this, (expr)res);
+		struct unop<op_not> notA(b.oper1);
+		struct unop<op_not> notB(b.oper2);
+		struct binop<op_and> aAndB(b.oper1, b.oper2);
+		struct binop<op_and> notAAndNotB(notA, notB);
+		struct binop<op_or> res(aAndB, notAAndNotB);
+		return boost::apply_visitor(*this, (expr) res);
 	}
 
-	std::string print(const std::string &op, const expr &l, const expr &r) const {
+	std::string print(const std::string &op, const expr &l,
+			const expr &r) const {
 		std::string res = boost::apply_visitor(*this, l);
 		res = res + " ";
 		res = res + boost::apply_visitor(*this, r);
@@ -138,25 +139,22 @@ struct parser: qi::grammar<It, expr(), Skipper> {
 
 		expr_ = impl_.alias();
 
-		impl_ =
-				dblimpl_[_val = _1]
-						>> *("=>"
-								>> dblimpl_[_val = phx::construct<binop<op_impl>>(
-										_val, _1)]);
-		dblimpl_ =
-						or_[_val = _1]
-								>> *("<=>"
-										>> or_[_val = phx::construct<binop<op_dblimpl>>(
-												_val, _1)]);
+		impl_ = dblimpl_[_val = _1]
+				>> *("=>"
+						>> dblimpl_[_val = phx::construct<binop<op_impl>>(_val,
+								_1)]);
+		dblimpl_ = or_[_val = _1]
+				>> *("<=>"
+						>> or_[_val = phx::construct<binop<op_dblimpl>>(_val,
+								_1)]);
 
-		or_ = xor_[_val = _1]
-				>> *(no_case["or"]
-						>> xor_[_val = phx::construct<binop<op_or>>(_val, _1)]);
+		or_ = xor_[_val = _1] >> *((no_case["or"] | "||") >> xor_[_val =
+				phx::construct<binop<op_or>>(_val, _1)]);
 
 		xor_ = and_[_val = _1] >> *(no_case["xor"] >> and_[_val =
 				phx::construct<binop<op_xor>>(_val, _1)]);
 
-		and_ = neq_[_val = _1] >> *(no_case["and"] >> neq_[_val =
+		and_ = neq_[_val = _1] >> *((no_case["and"] | "&&") >> neq_[_val =
 				phx::construct<binop<op_and>>(_val, _1)]);
 
 		neq_ =
@@ -165,18 +163,16 @@ struct parser: qi::grammar<It, expr(), Skipper> {
 								>> eq_[_val = phx::construct<binop<op_neq>>(
 										_val, _1)]);
 
-		eq_ =
-				not_[_val = _1]
-						>> *("="
-								>> not_[_val = phx::construct<binop<op_eq>>(
-										_val, _1)]);
+		eq_ = not_[_val = _1]
+				>> *((*lit("="))
+						>> not_[_val = phx::construct<binop<op_eq>>(_val, _1)]);
 
 		not_ = ("not" > simple)[_val = phx::construct<unop<op_not>>(_1)]
 				| simple[_val = _1];
 
 		simple = (('(' > expr_ > ')') | var_);
 
-		var_ = (qi::lexeme[+qi::char_("a-zA-Z0-9_")]);
+		var_ = (qi::lexeme[+qi::char_("a-zA-Z0-9_\\-")]);
 
 		BOOST_SPIRIT_DEBUG_NODE(expr_);
 		BOOST_SPIRIT_DEBUG_NODE(impl_);

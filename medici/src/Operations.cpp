@@ -239,14 +239,26 @@ int Operations::testModelFromFileCTWedge(
 			} else {
 				if (parameterDef.rfind("{", 0) == 0) {
 					// Enumerative
-					pT.values = vector<string>();
-					parameterDef = parameterDef.substr(1, parameterDef.size() - 2);
-					boost::char_separator<char> sep(",");
-					boost::tokenizer<boost::char_separator<char>> tokens(parameterDef, sep);
-					for (const auto& t : tokens) {
-						valuesMap.insert({make_pair(parameterName, t), counter});
-						counter++;
-						pT.values.push_back(t);
+					if(parameterDef.rfind(",", 0) > 0) {
+						pT.values = vector<string>();
+						parameterDef = parameterDef.substr(1, parameterDef.size() - 2);
+						boost::char_separator<char> sep(",");
+						boost::tokenizer<boost::char_separator<char>> tokens(parameterDef, sep);
+						for (const auto& t : tokens) {
+							valuesMap.insert({make_pair(parameterName, t), counter});
+							counter++;
+							pT.values.push_back(t);
+						}
+					} else if (parameterDef.rfind(" ", 0)) {
+						pT.values = vector<string>();
+						parameterDef = parameterDef.substr(1, parameterDef.size() - 2);
+						boost::char_separator<char> sep(" ");
+						boost::tokenizer<boost::char_separator<char>> tokens(parameterDef, sep);
+						for (const auto& t : tokens) {
+							valuesMap.insert({make_pair(parameterName, t), counter});
+							counter++;
+							pT.values.push_back(t);
+						}
 					}
 				} else {
 					cout << parameterDef << endl;
