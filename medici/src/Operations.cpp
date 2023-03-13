@@ -230,7 +230,7 @@ int Operations::testModelFromFileCTWedge(
 			Operations::TestModel pT;
 			pT.parameters = 1;
 			pT.name = parameterName;
-			if (parameterDef == "Boolean") {
+			if (parameterDef == "Boolean" || parameterDef == "Boolean;") {
 				// Boolean parameter
 				pT.values = vector<string> {"false", "true"};
 				valuesMap.insert({make_pair(parameterName, "false"), counter});
