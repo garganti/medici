@@ -24,8 +24,6 @@ struct op_or {
 };
 struct op_and {
 };
-struct op_xor {
-};
 struct op_not {
 };
 struct op_eq {
@@ -43,7 +41,6 @@ template<typename tag> struct unop;
 
 typedef boost::variant<var, boost::recursive_wrapper<unop<op_not> >,
 		boost::recursive_wrapper<binop<op_and> >,
-		boost::recursive_wrapper<binop<op_xor> >,
 		boost::recursive_wrapper<binop<op_or> >,
 		boost::recursive_wrapper<binop<op_eq> >,
 		boost::recursive_wrapper<binop<op_impl> >,
@@ -78,9 +75,6 @@ struct printer: boost::static_visitor<std::string> {
 	}
 	std::string operator()(const binop<op_or> &b) const {
 		return print(" +", b.oper1, b.oper2);
-	}
-	std::string operator()(const binop<op_xor> &b) const {
-		return print(" ^", b.oper1, b.oper2);
 	}
 	std::string operator()(const binop<op_eq> &b) const {
 		std::string parName = boost::apply_visitor(*this, b.oper1);
@@ -139,58 +133,53 @@ struct parser: qi::grammar<It, expr(), Skipper> {
 
 		expr_ = impl_.alias();
 
-		impl_ = dblimpl_[_val = _1]
-				>> *("=>"
-						>> dblimpl_[_val = phx::construct<binop<op_impl>>(_val,
-								_1)]);
-		dblimpl_ = or_[_val = _1]
-				>> *("<=>"
-						>> or_[_val = phx::construct<binop<op_dblimpl>>(_val,
-								_1)]);
+				impl_ = dblimpl_[_val = _1]
+						>> *("=>"
+								>> dblimpl_[_val = phx::construct<binop<op_impl>>(_val,
+										_1)]);
+				dblimpl_ = or_[_val = _1]
+						>> *("<=>"
+								>> or_[_val = phx::construct<binop<op_dblimpl>>(_val,
+										_1)]);
 
-		or_ = xor_[_val = _1] >> *((no_case["or"] | "||") >> xor_[_val =
-				phx::construct<binop<op_or>>(_val, _1)]);
+				or_ = and_[_val = _1] >> *((no_case["or"] | "||") >> and_[_val =
+						phx::construct<binop<op_or>>(_val, _1)]);
 
-		xor_ = and_[_val = _1] >> *(no_case["xor"] >> and_[_val =
-				phx::construct<binop<op_xor>>(_val, _1)]);
+				and_ = neq_[_val = _1] >> *((no_case["and"] | "&&") >> neq_[_val =
+						phx::construct<binop<op_and>>(_val, _1)]);
 
-		and_ = neq_[_val = _1] >> *((no_case["and"] | "&&") >> neq_[_val =
-				phx::construct<binop<op_and>>(_val, _1)]);
+				neq_ =
+						eq_[_val = _1]
+								>> *("!="
+										>> eq_[_val = phx::construct<binop<op_neq>>(
+												_val, _1)]);
 
-		neq_ =
-				eq_[_val = _1]
-						>> *("!="
-								>> eq_[_val = phx::construct<binop<op_neq>>(
-										_val, _1)]);
+				eq_ = not_[_val = _1] >> *((*lit("=")) >> not_[_val =
+						phx::construct<binop<op_eq>>(_val, _1)]);
 
-		eq_ = not_[_val = _1]
-				>> *((*lit("="))
-						>> not_[_val = phx::construct<binop<op_eq>>(_val, _1)]);
+				not_ = ("not" > simple)[_val = phx::construct<unop<op_not>>(_1)]
+						| simple[_val = _1];
 
-		not_ = ("not" > simple)[_val = phx::construct<unop<op_not>>(_1)]
-				| simple[_val = _1];
+				simple = (('(' > expr_ > ')') | var_);
 
-		simple = (('(' > expr_ > ')') | var_);
+				var_ = (qi::lexeme[+qi::char_("a-zA-Z0-9_") - no_case["and"] - no_case["or"]]);
 
-		var_ = (qi::lexeme[+qi::char_("a-zA-Z0-9_\\-")]);
+				BOOST_SPIRIT_DEBUG_NODE(expr_);
+				BOOST_SPIRIT_DEBUG_NODE(impl_);
+				BOOST_SPIRIT_DEBUG_NODE(dblimpl_);
+				BOOST_SPIRIT_DEBUG_NODE(or_);
+				BOOST_SPIRIT_DEBUG_NODE(and_);
+				BOOST_SPIRIT_DEBUG_NODE(not_);
+				BOOST_SPIRIT_DEBUG_NODE(eq_);
+				BOOST_SPIRIT_DEBUG_NODE(neq_);
+				BOOST_SPIRIT_DEBUG_NODE(simple);
+				BOOST_SPIRIT_DEBUG_NODE(var_);
+			}
 
-		BOOST_SPIRIT_DEBUG_NODE(expr_);
-		BOOST_SPIRIT_DEBUG_NODE(impl_);
-		BOOST_SPIRIT_DEBUG_NODE(dblimpl_);
-		BOOST_SPIRIT_DEBUG_NODE(or_);
-		BOOST_SPIRIT_DEBUG_NODE(xor_);
-		BOOST_SPIRIT_DEBUG_NODE(and_);
-		BOOST_SPIRIT_DEBUG_NODE(not_);
-		BOOST_SPIRIT_DEBUG_NODE(eq_);
-		BOOST_SPIRIT_DEBUG_NODE(neq_);
-		BOOST_SPIRIT_DEBUG_NODE(simple);
-		BOOST_SPIRIT_DEBUG_NODE(var_);
-	}
-
-private:
-	qi::rule<It, var(), Skipper> var_;
-	qi::rule<It, expr(), Skipper> not_, and_, xor_, or_, simple, expr_, eq_,
-			impl_, neq_, dblimpl_;
+		private:
+			qi::rule<It, var(), Skipper> var_;
+			qi::rule<It, expr(), Skipper> not_, and_, or_, simple, expr_, eq_,
+					impl_, neq_, dblimpl_;
 };
 
 #endif // CONSTRAINTSPARSER_H_
