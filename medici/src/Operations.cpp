@@ -241,7 +241,7 @@ int Operations::testModelFromFileCTWedge(
 				if (parameterDef.rfind("{", 0) == 0) {
 					// Enumerative -> Remove possible ; at the end
 					if (boost::algorithm::ends_with(parameterDef, ";"))
-						parameterDef = parameterDef.substr(0, parameterDef.size() - 2);
+						parameterDef = parameterDef.substr(0, parameterDef.size() - 1);
 
 					if(parameterDef.rfind(",", 0) > 0) {
 						pT.values = vector<string>();
