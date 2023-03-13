@@ -157,8 +157,9 @@ struct parser: qi::grammar<It, expr(), Skipper> {
 				eq_ = not_[_val = _1] >> *((*lit("=")) >> not_[_val =
 						phx::construct<binop<op_eq>>(_val, _1)]);
 
-				not_ = ("not" > simple)[_val = phx::construct<unop<op_not>>(_1)]
-						| simple[_val = _1];
+				not_ = ("not" > simple)[_val = phx::construct<unop<op_not>>(_1)] |
+							   ("!" >> simple)[_val = phx::construct<unop<op_not>>(_1)]
+								| simple[_val = _1];
 
 				simple = (('(' > expr_ > ')') | var_);
 
