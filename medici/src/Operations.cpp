@@ -9,6 +9,7 @@
 #include "ConstraintsParser.h"
 #include <string>
 #include <boost/tokenizer.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 // Map for the parameters
 parameter_bimap valuesMap;
@@ -238,7 +239,10 @@ int Operations::testModelFromFileCTWedge(
 				counter++;
 			} else {
 				if (parameterDef.rfind("{", 0) == 0) {
-					// Enumerative
+					// Enumerative -> Remove possible ; at the end
+					if (boost::algorithm::ends_with(parameterDef, ";"))
+						parameterDef = parameterDef.substr(0, parameterDef.size() - 2);
+
 					if(parameterDef.rfind(",", 0) > 0) {
 						pT.values = vector<string>();
 						parameterDef = parameterDef.substr(1, parameterDef.size() - 2);
