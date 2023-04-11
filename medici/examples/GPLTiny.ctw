@@ -1,0 +1,16 @@
+Model GPLTiny 
+
+Parameters :
+GraphLibrary : Boolean
+Edges : {Directed,Undirected,NONE}
+Algorithms : Boolean
+Number : Boolean
+Cycle : Boolean 
+
+Constraints :
+# GraphLibrary == TRUE #
+# Edges != NONE <=> GraphLibrary == TRUE #
+# Algorithms == TRUE => GraphLibrary == TRUE #
+# Algorithms == TRUE => Number == TRUE OR Cycle == TRUE #
+# Number == TRUE => Algorithms == TRUE #
+# Cycle == TRUE => Algorithms == TRUE #

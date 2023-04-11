@@ -1,0 +1,59 @@
+Model MgplAheadModel 
+
+Parameters :
+Gpl : Boolean
+MainGpl : Boolean
+Test : Boolean
+StartHere : Boolean
+Base : Boolean
+Prog : Boolean
+Implementation : {NoEdges,OnlyNeighbors,Edges,NONE}
+GraphType : {Directed,Undirected,NONE}
+Weight : Boolean
+Wgt: Boolean
+Weighted : Boolean
+UnWeighted :Boolean
+Search : {DFS,BFS,NONE}
+Alg : Boolean
+Num : Boolean
+Number : Boolean
+Conn : Boolean
+Connected : Boolean
+StrongC : Boolean
+StronglyConnected : Boolean
+Cyc : Boolean
+Cycle : Boolean
+MPrim : Boolean
+MSTPrim : Boolean
+MKrus : Boolean
+MSTKruskal : Boolean
+Shortest : Boolean 
+
+Constraints :
+# Gpl == TRUE #
+# MainGpl == TRUE <=> Gpl == TRUE #
+# Test == TRUE <=> MainGpl == TRUE #
+# StartHere == TRUE <=> Test == TRUE #
+# Base == TRUE <=> StartHere == TRUE #
+# Prog == TRUE => StartHere == TRUE #
+# Implementation != NONE => MainGpl == TRUE #
+# GraphType != NONE => MainGpl == TRUE #
+# Weight = TRUE => MainGpl == TRUE #
+# UnWeighted = TRUE => Weight == TRUE #
+# Weighted == TRUE <=> Wgt == TRUE #
+# Search != NONE => MainGpl == TRUE #
+# Alg == TRUE <=> MainGpl == TRUE #
+# Alg == TRUE => (Num == TRUE OR Conn == TRUE OR StrongC == TRUE OR Cyc == TRUE OR MPrim == TRUE OR MKrus == TRUE OR Shortest == TRUE) #
+# Num == TRUE => Alg == TRUE #
+# Number == TRUE <=> Num == TRUE #
+# Conn == TRUE => Alg == TRUE #
+# Connected == TRUE <=> Conn == TRUE #
+# StrongC == TRUE => Alg == TRUE #
+# StronglyConnected == TRUE <=> StrongC == TRUE #
+# Cyc == TRUE => Alg == TRUE #
+# Cycle == TRUE <=> Cyc == TRUE #
+# MPrim == TRUE => Alg == TRUE #
+# MSTPrim == TRUE <=> MPrim == TRUE #
+# MKrus == TRUE => Alg == TRUE #
+# MSTKruskal == TRUE <=> MKrus == TRUE #
+# Shortest == TRUE => Alg == TRUE #

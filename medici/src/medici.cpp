@@ -239,6 +239,7 @@ int MEDICI::normalMode(Settings setting, vector<int> &res) {
 	logcout(LOG_INFO) << "***********************Elenco nodi risultati*************************************** \n";
 
 	mddListBest.printList(logcout(LOG_INFO));
+	mddListBest.nodoBase.writePicture("test", "pdf");
 
 	logcout(LOG_INFO) << "Tuple coperte: " << tupleList.nCovered << " Tuple da coprire: "
 			<< tupleList.nToCover << " Tuple non copribili: "

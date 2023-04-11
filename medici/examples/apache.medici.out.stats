@@ -1,0 +1,5 @@
+****Model name: ../../../examples/apache.medici *******
+Tuple coperte: 66927 Tuple da coprire: 0 Tuple non copribili: 3
+Ottenuti: 31 mdd
+time execution script 13942ms
+Tempo per ordinamenti: 836ms
