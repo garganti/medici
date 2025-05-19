@@ -36,3 +36,4 @@ medici/build/
 
 #binaries
 !binaries/cygwin/medici.exe
+medici/master.zip
