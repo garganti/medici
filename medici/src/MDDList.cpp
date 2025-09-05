@@ -24,8 +24,8 @@ MDDList::MDDList(forest *mdd) {
 	//
 	dd_edge all(mdd);
 	dd_edge edge(mdd); //=new dd_edge(mdd);
-	mdd->createEdge(true, edge);
-	mdd->createEdge(true, all);
+	mdd->create(true, edge);
+	mdd->create(true, all);
 	//edge.show(stdout,3); //TODO debug
 	//cout<<"***********"<<endl;
 	nodoVuoto = all;
@@ -125,7 +125,7 @@ int MDDList::checkForParameter(vector<int> it2, Tuple &tupla, int* bounds,
 			if (toCheck) {
 				nodeTmp *= list[mddIndex].node;
 				//	mdd->removeAllComputeTableEntries();
-				if (nodeTmp.getCardinality() <= 0) {
+				if (nodeTmp.apply(getCardinality() <= 0) {
 					//parametro non valido per constraints
 #ifdef DEBUG2
 					cout<<"Parametro non valido per constraints"<<endl;

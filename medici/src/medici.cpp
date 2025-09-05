@@ -8,6 +8,7 @@
 #include "MEDICI.h"
 #include "logger.hpp"
 #include "header.h"
+#include "policies.h"
 
 // da FCC >= 4.7 uint non � pi� supportato: https://github.com/CRPropa/CRPropa3/issues/89
 #ifndef uint
@@ -92,18 +93,23 @@ int MEDICI::normalMode(Settings setting, vector<int> &res) {
 	logcout(LOG_INFO) << getLibraryInfo() << endl;
 
 	// Create a domain
-	domain* d = createDomain();
+//	domain* d = createDomain();
+//	assert(d != 0);
+	// Create variable in the above domain
+//	d->createVariablesBottomUp(bounds, N);
+	
+	// AG AGO 25 creTE DOMANI AND AVRIABLES
+	domain* d = domain::createBottomUp(bounds, N);
 	assert(d != 0);
 
-	// Create variable in the above domain
-	d->createVariablesBottomUp(bounds, N);
 
 	logcout(LOG_INFO) << "Created domain with " << d->getNumVariables() << " variables\n";
 
 	// Create a forest in the above domain
-	forest* mdd = d->createForest(false,               // this is not a relation
-			forest::BOOLEAN,          // terminals are either true or false
-			forest::MULTI_TERMINAL    // disables edge-labeling
+	// Methods domain::createForest() should be replaced with forest::create().
+	forest* mdd = forest::create(d,false,               // this is not a relation
+			range_type::BOOLEAN,          // terminals are either true or false
+			edge_labeling::MULTI_TERMINAL    // disables edge-labeling
 			);
 	assert(mdd != 0);
 	//init mddlist
@@ -366,7 +372,8 @@ int MEDICI::validateMode(Settings setting) {
 	logcout(LOG_INFO) << "Created domain with " << d->getNumVariables() << " variables\n";
 
 	// Create a forest in the above domain
-	forest* mdd = d->createForest(false,               // this is not a relation
+	// ag Methods domain::createForest() should be replaced with forest::create().
+	forest* mdd = d->create(false,               // this is not a relation
 			forest::BOOLEAN,          // terminals are either true or false
 			forest::MULTI_TERMINAL    // disables edge-labeling
 			);

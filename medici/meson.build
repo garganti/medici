@@ -1,19 +1,11 @@
 project('medici', 'cpp')
 
-# meddly
-# to download and install meddly
-# 
-# questi i comandi per installare meddly
-# wget https://github.com/asminer/meddly/archive/refs/heads/master.zip
-# unzip master.zip
-# cd meddly-master
-# sudo apt-get install libgmp-dev
-# sudo apt-get install autoconf
-# installa latre libs
-# sudo ./developers/Config_generic.sh
-# sudo make
-# sudo install  
-# questo nonbostale l'uso di su install meddly in una sub dir locale di meddly-master
+# Define the custom target
+meddly_lib = custom_target(
+  'meddly',  # Name of the target
+  command: 'install_meddly.sh',
+  output: 'libmeddly.a'
+)
 
 
 # adesso leggo la libreria

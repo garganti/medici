@@ -9,7 +9,8 @@
 #define HEADER_H_
 
 #include <meddly.h>
-#include <meddly_expert.h>
+// it has ebee eleminated 
+// #include <meddly_expert.h>
 
 #include <iostream>
 #include <stdlib.h>

@@ -11,7 +11,7 @@
 #include <sstream>
 #include "logger.hpp"
 
-// da FCC >= 4.7 uint non è più supportato: https://github.com/CRPropa/CRPropa3/issues/89
+// da FCC >= 4.7 uint non ï¿½ piï¿½ supportato: https://github.com/CRPropa/CRPropa3/issues/89
 #ifndef uint
 #define uint unsigned int
 #endif
@@ -80,7 +80,7 @@ int TupleList::checkTuples(TupleList list) {
 			set_intersection(it->paramCASA.begin(), it->paramCASA.end(),
 					it2->paramCASA.begin(), it2->paramCASA.end(),
 					std::back_inserter(res));
-			if (res.size() == nWise) //se sono identiche l'intersezione è uguale all'inizio
+			if (res.size() == nWise) //se sono identiche l'intersezione ï¿½ uguale all'inizio
 					{
 				it->print(logcout(LOG_INFO));
 				it2->print(logcout(LOG_INFO));
@@ -129,19 +129,20 @@ TupleList TupleList::generateNWise(int* bounds, int nel, int nWise, Settings s) 
 		//creazione mdd meddly
 
 		// Create a domain
-		domain* d = createDomain();
+		domain* d = domain::create();
 		assert(d != 0);
 
 		// Create variable in the above domain
 		d->createVariablesBottomUp(subBounds, N);
-		forest* mdd = d->createForest(false,           // this is not a relation
-				forest::BOOLEAN,          // terminals are either true or false
-				forest::MULTI_TERMINAL    // disables edge-labeling
+		forest* mdd = forest::create(d,false,           // this is not a relation
+				range_type::BOOLEAN,          // terminals are either true or false
+				edge_labeling::MULTI_TERMINAL    // disables edge-labeling
 				);
 		assert(mdd != 0);
 		dd_edge all(mdd);
 		mdd->createEdge(true, all);
-		for (enumerator iter(all); iter; ++iter) {
+		//for (enumerator iter(all); iter; ++iter) {
+		for (dd_edge::iterator iter = all.begin(); iter; ++iter)
 			const int* minterm = iter.getAssignments();
 			vector<cvalue> El(nel, -1);
 			for (int i = N; i > 0; i--) {
@@ -181,7 +182,7 @@ void TupleList::setCovered(Tuple &t) {
 	 for (std::list<Tuple>::iterator it = tList.begin(), end = tList.end(); it != end; ++it)
 	 {
 	 //nodo attuale
-	 if (it->status>=0) //Se è già coperta non serve  //TODO invece se ci sono ancora tuple copribili va considerato
+	 if (it->status>=0) //Se ï¿½ giï¿½ coperta non serve  //TODO invece se ci sono ancora tuple copribili va considerato
 	 {
 	 //sfoglio controllo ed eventualmente elimino
 	 //it->compatible.remove(&it);
@@ -274,20 +275,20 @@ void TupleList::checkParamList(forest* mdd) {
 
 		//		}
 	}
-	//fino a qui è ordinato per index parametri
+	//fino a qui ï¿½ ordinato per index parametri
 	weightMax = 0;
 	for (std::list<Tuple>::iterator it = tList.begin(), end = tList.end();
 			it != end; ++it) {
 		//assegno peso a tuple
 		it->weight = 0;
-		it->weightMax = 0; //peso del parametro più pesante
+		it->weightMax = 0; //peso del parametro piï¿½ pesante
 		for (std::vector<int>::iterator it2 = it->param.begin(), end =
 				it->param.end(); it2 != end; ++it2) {
 			it->weight += indexList[*it2][1];//+((double)it->code[*it2])/100;
 			//TODO vedere se mantenere modifica
 
 			if (indexList[*it2][1] > it->weightMax) {
-				it->weightMax = indexList[*it2][1]; //NB in [][0] c'è l'indice del parametro che prima del riordino è guauale a quello del vettore
+				it->weightMax = indexList[*it2][1]; //NB in [][0] c'ï¿½ l'indice del parametro che prima del riordino ï¿½ guauale a quello del vettore
 			}
 		}
 		if (it->weight > weightMax)
@@ -331,7 +332,7 @@ void TupleList::sortCompatibility(int mode) {
 	}
 	if (mode == 4) {
 		int size=tList.size(); //TODO debug levare
-		//provo a mettere solo in cima il più pesante
+		//provo a mettere solo in cima il piï¿½ pesante
 		list<Tuple>::iterator first = tList.begin();
 		//	cout<<"CERCANDO WEIGHTMAX "<<weightMax<<endl;
 		for (std::list<Tuple>::iterator it = tList.begin(), end = tList.end();
@@ -397,17 +398,17 @@ void TupleList::checkParamListCASA(forest* mdd) {
 
 		//		}
 	}
-	//fino a qui è ordinato per index parametri
+	//fino a qui ï¿½ ordinato per index parametri
 	for (std::list<Tuple>::iterator it = tList.begin(), end = tList.end();
 			it != end; ++it) {
 		//assegno peso a tuple
 		it->weight = 0;
-		it->weightMax = 0; //peso del parametro più pesante
+		it->weightMax = 0; //peso del parametro piï¿½ pesante
 		for (std::vector<int>::iterator it2 = it->paramCASA.begin(), end =
 				it->paramCASA.end(); it2 != end; ++it2) {
 			it->weight += indexListCASA[*it2][1];
 			if (indexListCASA[*it2][1] > it->weightMax) {
-				it->weightMax = indexListCASA[*it2][1]; //NB in [][0] c'è l'indice del parametro che prima del riordino è guauale a quello del vettore
+				it->weightMax = indexListCASA[*it2][1]; //NB in [][0] c'ï¿½ l'indice del parametro che prima del riordino ï¿½ guauale a quello del vettore
 			}
 		}
 
@@ -442,16 +443,16 @@ int TupleList::checkCompatibility(forest *mdd, dd_edge nodoBase)
 	}
 	for (std::list<Tuple>::iterator it = tList.begin(), end = tList.end();
 			it != end; ++it) {
-		if ((it->status==0)) //Se è già coperta non serve
+		if ((it->status==0)) //Se ï¿½ giï¿½ coperta non serve
 		{
 			//dd_edge node = Operations::getMDDFromTuple(it->code,mdd);
 			//confronto con successive escludendo se stessa
 			for (std::list<Tuple>::iterator it2 = it, end = tList.end();
 						it2 != end; ++it2) {
-				if ((it2->status==0)&&(it!=it2)){ //se è già coperta non serve, idem non la confronto con se stessa
+				if ((it2->status==0)&&(it!=it2)){ //se ï¿½ giï¿½ coperta non serve, idem non la confronto con se stessa
 					//dd_edge node2 = Operations::getMDDFromTuple(it2->code,mdd);
 					//dd_edge node2 = Operations::getMDDFromTuple({0,0,-1},mdd);
-					//-1 se non compatibili, >0 se compatibili, nota che potrei controllare che ogni altra combinazione è impossibile, per ottimizzare
+					//-1 se non compatibili, >0 se compatibili, nota che potrei controllare che ogni altra combinazione ï¿½ impossibile, per ottimizzare
 					int compatible = Tuple::isIncludedTuple(&(*it),&(*it2));
 					//double cardinality = Operations::getCardinalityDifference(node,node2); //TODO da rimettere
 					//nchecks++;
@@ -526,7 +527,7 @@ void TupleList::checkParamListNew(forest* mdd) {
 
 		//		}
 	}
-	//fino a qui è ordinato per index parametri
+	//fino a qui ï¿½ ordinato per index parametri
 
 
 

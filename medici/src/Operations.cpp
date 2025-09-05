@@ -557,16 +557,16 @@ void Operations::printElements(std::ostream &strm, dd_edge &e,
 			strm << " " << minterm[i];
 		}
 		switch ((e.getForest())->getRangeType()) {
-		case forest::BOOLEAN:
+		case range_type::BOOLEAN:
 			strm << " --> T]\n";
 			break;
-		case forest::INTEGER: {
+		case range_type::INTEGER: {
 			int val = 0;
 			iter.getValue(val);
 			strm << " --> " << val << "]\n";
 		}
 			break;
-		case forest::REAL: {
+		case range_type::REAL: {
 			int val = 0;
 			iter.getValue(val);
 			strm << " --> " << val << "]\n"; //&&%0.3f
